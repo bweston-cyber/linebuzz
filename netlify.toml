@@ -1,3 +1,14 @@
-# Static site. Connecting this repo in Netlify publishes on every push.
+# Static site plus one function. A push publishes both.
 [build]
   publish = "."
+  command = "node netlify/lib/build-seed.mjs"
+  functions = "netlify/functions"
+
+[functions."question"]
+  timeout = 26
+
+[[redirects]]
+  from = "/api/question"
+  to = "/.netlify/functions/question"
+  status = 200
+  force = true

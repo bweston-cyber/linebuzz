@@ -1,0 +1,12 @@
+{
+  "name": "linebuzz",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seed": "node netlify/lib/build-seed.mjs",
+    "test": "node --test netlify/lib/pick.test.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^10.7.13"
+  }
+}

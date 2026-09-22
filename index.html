@@ -193,7 +193,21 @@
           <button class="btn-ghost span" id="qrBtn">Show QR code</button>
         </div>
         <div class="host-q" style="margin-top:8px">
-          <label for="packSelect">Question packs in /questions (optional)</label>
+          <label for="grokTheme">New questions from Grok</label>
+          <input id="grokTheme" maxlength="120" placeholder="90s movies, or leave blank for a mix" />
+          <div class="row" style="margin-top:10px">
+            <div>
+              <label for="grokCount">How many</label>
+              <input id="grokCount" type="number" min="1" max="12" value="8" />
+            </div>
+            <div>
+              <label for="grokPin">Host pin</label>
+              <input id="grokPin" type="password" maxlength="80" autocomplete="current-password" placeholder="Set on the server" />
+            </div>
+          </div>
+          <button class="btn-gold" id="grokBtn" type="button" style="width:100%;margin-top:12px">Write questions with Grok</button>
+          <p class="hint" id="grokStatus" style="text-align:left;margin:8px 0 0">Grok checks the packs already on this site, plus every question it has written before.</p>
+          <label for="packSelect" style="margin-top:14px">Or use a saved pack</label>
           <div class="row">
             <select id="packSelect" style="width:100%;padding:14px;border-radius:12px;border:1px solid var(--line);background:#0e1428;color:var(--text);font-size:1rem">
               <option value="">— choose a file —</option>
@@ -941,6 +955,43 @@
       sessionStorage.removeItem('linebuzz');
       try { client && client.end(true); } catch {}
       location.href = location.pathname;
+    };
+    $('grokTheme').value = localStorage.getItem('linebuzz-theme') || '';
+    $('grokPin').value = localStorage.getItem('linebuzz-pin') || '';
+    $('grokBtn').onclick = async () => {
+      const pin = $('grokPin').value.trim();
+      const theme = $('grokTheme').value.trim();
+      const count = Math.max(1, Math.min(12, parseInt($('grokCount').value || '8', 10) || 8));
+      if (!pin) { toast('Enter the host pin'); return; }
+      localStorage.setItem('linebuzz-pin', pin);
+      localStorage.setItem('linebuzz-theme', theme);
+      $('grokBtn').disabled = true;
+      $('grokStatus').textContent = 'Asking Grok for new questions…';
+      try {
+        const res = await fetch('/api/question', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'x-linebuzz-pin': pin },
+          body: JSON.stringify({ theme, count })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 404) throw new Error('This copy of the site has no Grok server. Use the Netlify address.');
+        if (!res.ok) throw new Error(data.error || ('Could not write questions (' + res.status + ')'));
+        const items = Array.isArray(data.questions) ? data.questions : [];
+        if (!items.length) throw new Error('Grok did not return any new questions');
+        pack = items.map(item => ({ q: String(item.q), a: String(item.a) }));
+        packName = 'grok';
+        packIndex = -1;
+        askedRound = 0;
+        $('askLimit').value = String(pack.length);
+        $('grokStatus').textContent = 'Grok wrote ' + pack.length + '. These are saved so they will not come up again.';
+        $('packStatus').textContent = 'Using ' + pack.length + ' new Grok questions.';
+        showQA();
+        setHostTab('play');
+      } catch (err) {
+        $('grokStatus').textContent = err.message || 'Could not reach Grok';
+      } finally {
+        $('grokBtn').disabled = false;
+      }
     };
     $('refreshPacksBtn').onclick = () => listQuestionFiles();
     $('packSelect').onchange = () => { if ($('packSelect').value) loadPack($('packSelect').value); };
