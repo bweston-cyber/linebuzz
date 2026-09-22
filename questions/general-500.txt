@@ -1,0 +1,1004 @@
+LINEBUZZ PACK 2 — 500 TOSS-UPS
+Host only. Distinct from starter-100.
+
+GENERAL
+1. What is the capital of Canada?
+   Ottawa
+2. What is the capital of Australia?
+   Canberra
+3. What is the capital of Egypt?
+   Cairo
+4. What is the capital of China?
+   Beijing
+5. What is the capital of India?
+   New Delhi
+6. What is the capital of Russia?
+   Moscow
+7. What is the capital of Germany?
+   Berlin
+8. What is the capital of South Korea?
+   Seoul
+9. What is the capital of Mexico?
+   Mexico City
+10. What is the capital of Brazil?
+   Brasília
+11. What is the capital of Argentina?
+   Buenos Aires
+12. What is the capital of Peru?
+   Lima
+13. What is the capital of Chile?
+   Santiago
+14. What is the capital of Colombia?
+   Bogotá
+15. What is the capital of Venezuela?
+   Caracas
+16. What is the capital of Ecuador?
+   Quito
+17. What is the capital of Uruguay?
+   Montevideo
+18. What is the capital of Paraguay?
+   Asunción
+19. What is the capital of Bolivia?
+   La Paz
+20. What is the capital of Cuba?
+   Havana
+21. What is the capital of Jamaica?
+   Kingston
+22. What is the capital of Haiti?
+   Port-au-Prince
+23. What is the capital of Dominican Republic?
+   Santo Domingo
+24. What is the capital of Puerto Rico?
+   San Juan
+25. What is the capital of Panama?
+   Panama City
+26. What is the capital of Costa Rica?
+   San José
+27. What is the capital of Honduras?
+   Tegucigalpa
+28. What is the capital of Nicaragua?
+   Managua
+29. What is the capital of Guatemala?
+   Guatemala City
+30. What is the capital of Belize?
+   Belmopan
+31. What is the capital of Bahamas?
+   Nassau
+32. What is the capital of Barbados?
+   Bridgetown
+33. What is the capital of Norway?
+   Oslo
+34. What is the capital of Sweden?
+   Stockholm
+35. What is the capital of Finland?
+   Helsinki
+36. What is the capital of Denmark?
+   Copenhagen
+37. What is the capital of Ireland?
+   Dublin
+38. What is the capital of Portugal?
+   Lisbon
+39. What is the capital of Belgium?
+   Brussels
+40. What is the capital of Netherlands?
+   Amsterdam
+41. What is the capital of Switzerland?
+   Bern
+42. What is the capital of Austria?
+   Vienna
+43. What is the capital of Poland?
+   Warsaw
+44. What is the capital of Czech Republic?
+   Prague
+45. What is the capital of Hungary?
+   Budapest
+46. What is the capital of Romania?
+   Bucharest
+47. What is the capital of Bulgaria?
+   Sofia
+48. What is the capital of Greece?
+   Athens
+49. What is the capital of Turkey?
+   Ankara
+50. What is the capital of Ukraine?
+   Kyiv
+51. What is the capital of Belarus?
+   Minsk
+52. What is the capital of Lithuania?
+   Vilnius
+53. What is the capital of Latvia?
+   Riga
+54. What is the capital of Estonia?
+   Tallinn
+55. What is the capital of Iceland?
+   Reykjavik
+56. What is the capital of Croatia?
+   Zagreb
+57. What is the capital of Serbia?
+   Belgrade
+58. What is the capital of Bosnia and Herzegovina?
+   Sarajevo
+59. What is the capital of North Macedonia?
+   Skopje
+60. What is the capital of Albania?
+   Tirana
+61. What is the capital of Slovenia?
+   Ljubljana
+62. What is the capital of Slovakia?
+   Bratislava
+63. What is the capital of Moldova?
+   Chișinău
+64. What is the capital of Georgia the country?
+   Tbilisi
+65. What is the capital of Armenia?
+   Yerevan
+66. What is the capital of Azerbaijan?
+   Baku
+67. What is the capital of Uzbekistan?
+   Tashkent
+68. What is the capital of Kazakhstan?
+   Astana
+69. What is the capital of Mongolia?
+   Ulaanbaatar
+70. What is the capital of Vietnam?
+   Hanoi
+71. What is the capital of Thailand?
+   Bangkok
+72. What is the capital of Indonesia?
+   Jakarta
+73. What is the capital of Philippines?
+   Manila
+74. What is the capital of Malaysia?
+   Kuala Lumpur
+75. What is the capital of Singapore?
+   Singapore
+76. What is the capital of Pakistan?
+   Islamabad
+77. What is the capital of Afghanistan?
+   Kabul
+78. What is the capital of Iran?
+   Tehran
+79. What is the capital of Iraq?
+   Baghdad
+80. What is the capital of Saudi Arabia?
+   Riyadh
+81. What is the capital of Yemen?
+   Sanaa
+82. What is the capital of Oman?
+   Muscat
+83. What is the capital of Qatar?
+   Doha
+84. What is the capital of United Arab Emirates?
+   Abu Dhabi
+85. What is the capital of Kuwait?
+   Kuwait City
+86. What is the capital of Lebanon?
+   Beirut
+87. What is the capital of Jordan?
+   Amman
+88. What is the capital of Israel?
+   Jerusalem
+89. What is the capital of Syria?
+   Damascus
+90. What is the capital of Cyprus?
+   Nicosia
+91. What is the capital of Kenya?
+   Nairobi
+92. What is the capital of Ethiopia?
+   Addis Ababa
+93. What is the capital of Uganda?
+   Kampala
+94. What is the capital of Tanzania?
+   Dar es Salaam
+95. What is the capital of Rwanda?
+   Kigali
+96. What is the capital of Sudan?
+   Khartoum
+97. What is the capital of Libya?
+   Tripoli
+98. What is the capital of Tunisia?
+   Tunis
+99. What is the capital of Algeria?
+   Algiers
+100. What is the capital of Morocco?
+   Rabat
+101. What is the capital of Ghana?
+   Accra
+102. What is the capital of Nigeria?
+   Abuja
+103. What is the capital of Senegal?
+   Dakar
+104. What is the capital of Mali?
+   Bamako
+105. What is the capital of Burkina Faso?
+   Ouagadougou
+106. What is the capital of South Africa?
+   Pretoria
+107. What is the capital of Zimbabwe?
+   Harare
+108. What is the capital of Zambia?
+   Lusaka
+109. What is the capital of Mozambique?
+   Maputo
+110. What is the capital of Madagascar?
+   Antananarivo
+111. What is the capital of Mauritius?
+   Port Louis
+112. What is the capital of New Zealand?
+   Wellington
+113. What is the capital of Fiji?
+   Suva
+114. What is the capital of Papua New Guinea?
+   Port Moresby
+115. What is the capital of Samoa?
+   Apia
+116. What is the capital of the U.S. state of Alabama?
+   Montgomery
+117. What is the capital of the U.S. state of Alaska?
+   Juneau
+118. What is the capital of the U.S. state of Arizona?
+   Phoenix
+119. What is the capital of the U.S. state of Arkansas?
+   Little Rock
+120. What is the capital of the U.S. state of California?
+   Sacramento
+121. What is the capital of the U.S. state of Colorado?
+   Denver
+122. What is the capital of the U.S. state of Connecticut?
+   Hartford
+123. What is the capital of the U.S. state of Delaware?
+   Dover
+124. What is the capital of the U.S. state of Florida?
+   Tallahassee
+125. What is the capital of the U.S. state of Hawaii?
+   Honolulu
+126. What is the capital of the U.S. state of Idaho?
+   Boise
+127. What is the capital of the U.S. state of Illinois?
+   Springfield
+128. What is the capital of the U.S. state of Indiana?
+   Indianapolis
+129. What is the capital of the U.S. state of Iowa?
+   Des Moines
+130. What is the capital of the U.S. state of Kansas?
+   Topeka
+131. What is the capital of the U.S. state of Kentucky?
+   Frankfort
+132. What is the capital of the U.S. state of Louisiana?
+   Baton Rouge
+133. What is the capital of the U.S. state of Maine?
+   Augusta
+134. What is the capital of the U.S. state of Maryland?
+   Annapolis
+135. What is the capital of the U.S. state of Massachusetts?
+   Boston
+136. What is the capital of the U.S. state of Michigan?
+   Lansing
+137. What is the capital of the U.S. state of Minnesota?
+   Saint Paul
+138. What is the capital of the U.S. state of Mississippi?
+   Jackson
+139. What is the capital of the U.S. state of Missouri?
+   Jefferson City
+140. What is the capital of the U.S. state of Montana?
+   Helena
+141. What is the capital of the U.S. state of Nebraska?
+   Lincoln
+142. What is the capital of the U.S. state of Nevada?
+   Carson City
+143. What is the capital of the U.S. state of New Hampshire?
+   Concord
+144. What is the capital of the U.S. state of New Jersey?
+   Trenton
+145. What is the capital of the U.S. state of New Mexico?
+   Santa Fe
+146. What is the capital of the U.S. state of New York?
+   Albany
+147. What is the capital of the U.S. state of North Carolina?
+   Raleigh
+148. What is the capital of the U.S. state of North Dakota?
+   Bismarck
+149. What is the capital of the U.S. state of Ohio?
+   Columbus
+150. What is the capital of the U.S. state of Oklahoma?
+   Oklahoma City
+151. What is the capital of the U.S. state of Oregon?
+   Salem
+152. What is the capital of the U.S. state of Pennsylvania?
+   Harrisburg
+153. What is the capital of the U.S. state of Rhode Island?
+   Providence
+154. What is the capital of the U.S. state of South Carolina?
+   Columbia
+155. What is the capital of the U.S. state of South Dakota?
+   Pierre
+156. What is the capital of the U.S. state of Tennessee?
+   Nashville
+157. What is the capital of the U.S. state of Texas?
+   Austin
+158. What is the capital of the U.S. state of Utah?
+   Salt Lake City
+159. What is the capital of the U.S. state of Vermont?
+   Montpelier
+160. What is the capital of the U.S. state of Virginia?
+   Richmond
+161. What is the capital of the U.S. state of Washington?
+   Olympia
+162. What is the capital of the U.S. state of West Virginia?
+   Charleston
+163. What is the capital of the U.S. state of Wisconsin?
+   Madison
+164. What is the capital of the U.S. state of Wyoming?
+   Cheyenne
+165. What is the name of Harry Potter’s owl?
+   Hedwig
+166. Who wrote Pride and Prejudice?
+   Jane Austen
+167. How many minutes are in a day?
+   1440
+168. What planet is closest to the Sun?
+   Mercury
+169. Who painted the Mona Lisa?
+   Leonardo da Vinci
+170. In chess, which piece moves only diagonally?
+   Bishop
+171. What year did World War II end?
+   1945
+172. What is the chemical symbol for iron?
+   Fe
+173. Which U.S. state is nicknamed the Empire State?
+   New York
+174. Who is the Greek god of the sea?
+   Poseidon
+175. What company makes the PlayStation?
+   Sony
+176. How many strings does a standard violin have?
+   4
+177. What is the tallest mountain in North America?
+   Denali
+178. Who wrote Romeo and Juliet?
+   William Shakespeare
+179. What gas makes up most of Earth’s atmosphere?
+   Nitrogen
+180. Which NFL team plays in Green Bay?
+   Packers
+181. What is the currency of Japan?
+   Yen
+182. Who was the first woman on the U.S. Supreme Court?
+   Sandra Day O’Connor
+183. What sea creature has three hearts?
+   Octopus
+184. Which Disney princess has a chameleon named Pascal?
+   Rapunzel
+185. What is the smallest prime number?
+   2
+186. Who is credited with inventing the telephone in U.S. classrooms?
+   Alexander Graham Bell
+187. How many Great Lakes are there?
+   5
+188. What is the name of Batman’s butler?
+   Alfred
+189. Which instrument has 88 keys?
+   Piano
+190. Who scored the “Hand of God” goal?
+   Diego Maradona
+191. What metal is liquid at room temperature?
+   Mercury
+192. Which ocean is on the East Coast of the United States?
+   Atlantic
+193. Who wrote The Hobbit?
+   J.R.R. Tolkien
+194. What is the fastest land animal?
+   Cheetah
+195. How many U.S. senators are there?
+   100
+196. What is the main language of Brazil?
+   Portuguese
+197. Who first ran a mile in under four minutes?
+   Roger Bannister
+198. What color do you get by mixing red and blue?
+   Purple
+199. Who painted Starry Night?
+   Vincent van Gogh
+200. What does CPU stand for?
+   Central Processing Unit
+201. Which sport uses love and deuce?
+   Tennis
+202. What is the largest bone in the human body?
+   Femur
+203. What island nation lies east of Mozambique?
+   Madagascar
+204. What is the square root of 81?
+   9
+205. Who directed Pulp Fiction?
+   Quentin Tarantino
+206. What organ produces insulin?
+   Pancreas
+207. Which U.S. president is on the $20 bill?
+   Andrew Jackson
+208. Who created Mickey Mouse?
+   Walt Disney
+209. Which country gifted the Statue of Liberty?
+   France
+210. How many sides does a hexagon have?
+   6
+211. What city hosted the 1996 Summer Olympics?
+   Atlanta
+212. Who sang “Purple Rain”?
+   Prince
+213. Which cells help blood clot?
+   Platelets
+214. What is the only U.S. state starting with P?
+   Pennsylvania
+215. Who was the first African American U.S. president?
+   Barack Obama
+216. What scale is commonly cited for earthquake magnitude?
+   Richter
+217. What is the largest internal organ?
+   Liver
+218. Who wrote 1984?
+   George Orwell
+219. How many points is a safety worth in football?
+   2
+220. What element has atomic number 1?
+   Hydrogen
+221. What is Mario’s brother’s name?
+   Luigi
+222. What year did the Titanic sink?
+   1912
+223. Which bird is the U.S. national symbol?
+   Bald eagle
+224. Who composed The Four Seasons?
+   Vivaldi
+225. What is the hardest natural substance?
+   Diamond
+226. How many innings in regulation softball?
+   7
+227. What does DNA stand for?
+   Deoxyribonucleic acid
+228. What is the largest country by area?
+   Russia
+229. Who painted the Sistine Chapel ceiling?
+   Michelangelo
+230. Which U.S. state has the most coastline?
+   Alaska
+231. Who is Sherlock Holmes’s partner?
+   Dr. Watson
+232. How many chambers does the human heart have?
+   4
+233. Who won the first Super Bowl?
+   Green Bay Packers
+234. What fruit is dried to make raisins?
+   Grapes
+235. What is the smallest country in the world?
+   Vatican City
+236. Who wrote To Kill a Mockingbird?
+   Harper Lee
+237. What is water’s boiling point in Fahrenheit?
+   212
+238. Which instrument does Yo-Yo Ma play?
+   Cello
+239. How many adult teeth does a typical person have?
+   32
+240. Who is the Roman god of war?
+   Mars
+241. Who discovered penicillin?
+   Alexander Fleming
+242. Which trophy goes to the NHL playoff champion?
+   Stanley Cup
+243. What gas do humans need to breathe?
+   Oxygen
+244. Who sang “Rolling in the Deep”?
+   Adele
+245. What is the largest mammal?
+   Blue whale
+246. How many stripes are on the U.S. flag?
+   13
+247. What vitamin does sunlight help produce?
+   Vitamin D
+248. Which state is the Lone Star State?
+   Texas
+249. What is 12 squared?
+   144
+250. What is the largest island in the world?
+   Greenland
+251. Who painted Girl with a Pearl Earring?
+   Vermeer
+252. What animal is the WWF logo?
+   Giant panda
+253. What does HTML stand for?
+   HyperText Markup Language
+254. Who is the Greek goddess of wisdom?
+   Athena
+255. What is the hottest planet in the solar system?
+   Venus
+256. How many players on a soccer team on the field?
+   11
+257. Who wrote The Great Gatsby?
+   F. Scott Fitzgerald
+258. What is the name of the bear in The Jungle Book?
+   Baloo
+259. How many degrees in a right angle?
+   90
+260. Who is the lead singer of U2?
+   Bono
+261. Which ocean is the smallest?
+   Arctic
+262. Who was Rome’s first emperor?
+   Augustus
+263. What is the UK’s currency?
+   Pound sterling
+264. Which NBA team plays in Los Angeles and is nicknamed the Lakers?
+   Los Angeles Lakers
+265. Who carved David in Florence?
+   Michelangelo
+266. What is the cowboy’s name in Toy Story?
+   Woody
+267. Who invented dynamite?
+   Alfred Nobel
+268. What is Canada’s largest city by population?
+   Toronto
+269. Diamonds are a form of which element?
+   Carbon
+270. What year did the Berlin Wall fall?
+   1989
+271. Who sang “Superstition”?
+   Stevie Wonder
+272. What is the study of weather called?
+   Meteorology
+273. Which state is the Grand Canyon State?
+   Arizona
+274. Who wrote Moby-Dick?
+   Herman Melville
+275. How many weeks are in a year?
+   52
+276. What is Peter Parker’s superhero name?
+   Spider-Man
+277. Table salt is mostly which compound?
+   Sodium chloride
+278. Which country contains Mount Kilimanjaro?
+   Tanzania
+279. How many skaters per hockey team are on the ice, including the goalie?
+   6
+280. Who painted American Gothic?
+   Grant Wood
+281. What do bees collect to make honey?
+   Nectar
+282. Which play contains “To be, or not to be”?
+   Hamlet
+283. What is silver’s chemical symbol?
+   Ag
+284. Who was the first American woman in space?
+   Sally Ride
+285. What desert spans Mongolia and northern China?
+   Gobi
+286. Who drafted most of the Declaration of Independence?
+   Thomas Jefferson
+287. Pi to two decimal places is what?
+   3.14
+288. Who is the Norse god of thunder?
+   Thor
+289. How many ounces are in a pound?
+   16
+290. What river does the Hoover Dam dam?
+   Colorado River
+291. Who directed Back to the Future?
+   Robert Zemeckis
+292. How many colors in the ROYGBIV rainbow?
+   7
+293. What process do plants use to make food from sunlight?
+   Photosynthesis
+294. Which state is the Peach State?
+   Georgia
+295. Who wrote Charlotte’s Web?
+   E.B. White
+296. What is the huge volcano on Mars called?
+   Olympus Mons
+297. How many points is a typical NFL field goal worth?
+   3
+298. Who is the villain in The Lion King?
+   Scar
+299. What does USB stand for?
+   Universal Serial Bus
+300. Water freezes at what Fahrenheit temperature?
+   32
+301. How many legs does a spider have?
+   8
+302. What ship brought the Pilgrims in 1620?
+   Mayflower
+303. Who sang “Wannabe”?
+   Spice Girls
+304. What is potassium’s chemical symbol?
+   K
+305. Which sport uses a puck?
+   Hockey
+306. How many bits are in a byte?
+   8
+307. What is the fairy’s name in Peter Pan?
+   Tinker Bell
+308. Who wrote The Chronicles of Narnia?
+   C.S. Lewis
+309. Which planet has the Great Red Spot?
+   Jupiter
+310. How many volleyball players are on a court per team?
+   6
+311. What is Elsa’s sister named in Frozen?
+   Anna
+312. How many humps does a Bactrian camel have?
+   2
+313. What does GPS stand for?
+   Global Positioning System
+314. What baseball position is SS?
+   Shortstop
+315. Who composed Für Elise?
+   Beethoven
+316. How many zeros are in one million?
+   6
+317. What animal lays the largest eggs?
+   Ostrich
+318. Who is the Roman goddess of love?
+   Venus
+319. How many sides does a stop sign have?
+   8
+320. What is the most abundant metal in Earth’s crust?
+   Aluminum
+321. What language is spoken in Vienna?
+   German
+322. Who wrote Little Women?
+   Louisa May Alcott
+323. What nearby galaxy is commonly named with the Milky Way?
+   Andromeda
+324. Which film features “Let It Go”?
+   Frozen
+325. What unit measures electric current?
+   Ampere
+326. How many rings are on the Olympic flag?
+   5
+327. Who sang “I Want It That Way”?
+   Backstreet Boys
+328. What is the study of fossils called?
+   Paleontology
+329. What is the dragon’s name in The Hobbit?
+   Smaug
+330. How many teaspoons in a tablespoon?
+   3
+331. Who invented the European printing press?
+   Gutenberg
+332. What color is chlorophyll?
+   Green
+333. Which Great Lake is largest by area?
+   Superior
+334. How many yards are in a mile?
+   1760
+335. Who painted Water Lilies?
+   Monet
+336. What soccer position is GK?
+   Goalkeeper
+337. Who wrote The Catcher in the Rye?
+   J.D. Salinger
+338. Who is the Greek harvest goddess?
+   Demeter
+339. What company makes AirPods?
+   Apple
+340. What is table salt’s formula?
+   NaCl
+341. Who was the first human in space?
+   Yuri Gagarin
+342. What is the pig’s name in Charlotte’s Web?
+   Wilbur
+343. How many faces does a cube have?
+   6
+344. What year was the first moon landing?
+   1969
+345. Who wrote Harry Potter?
+   J.K. Rowling
+346. How many fluid ounces are in a cup?
+   8
+347. What does ATM stand for?
+   Automated Teller Machine
+348. Who directed Titanic?
+   James Cameron
+349. How many planets are in the solar system now?
+   8
+350. Which chess piece jumps over others?
+   Knight
+351. Who wrote Of Mice and Men?
+   John Steinbeck
+352. What is the body’s largest organ?
+   Skin
+353. Which hero is from Krypton?
+   Superman
+354. Who composed Messiah?
+   Handel
+355. What is the smallest planet?
+   Mercury
+356. Which fruit has seeds on the outside?
+   Strawberry
+357. What does PDF stand for?
+   Portable Document Format
+358. Who was the UK’s first female prime minister?
+   Margaret Thatcher
+359. How many millimeters are in a meter?
+   1000
+360. Which NFL position throws most often?
+   Quarterback
+361. What is helium’s symbol?
+   He
+362. Who painted melting clocks in The Persistence of Memory?
+   Dalí
+363. Who wrote The Odyssey?
+   Homer
+364. What is the largest Mediterranean island?
+   Sicily
+365. How many cents in a dollar?
+   100
+366. Which country hosted the 2016 Olympics?
+   Brazil
+367. Who is tied to the falling-apple gravity story?
+   Isaac Newton
+368. What is the tallest building of the 2020s?
+   Burj Khalifa
+369. How many lives is a cat said to have?
+   9
+370. Who is the Greek god of the underworld?
+   Hades
+371. Which state is famous for potatoes?
+   Idaho
+372. What is Saturn’s largest moon?
+   Titan
+373. How many ounces in a U.S. gallon?
+   128
+374. Who is the pirate in Peter Pan?
+   Captain Hook
+375. What is the fastest bird in a dive?
+   Peregrine falcon
+376. How many degrees in a triangle?
+   180
+377. Who carries the One Ring in The Lord of the Rings?
+   Frodo
+378. Who wrote The Scarlet Letter?
+   Nathaniel Hawthorne
+379. What is lead’s symbol?
+   Pb
+380. How many days in a leap year?
+   366
+381. Who completed the Twelve Labors?
+   Heracles
+382. Which city is the Windy City?
+   Chicago
+383. What is the largest fish?
+   Whale shark
+384. How many pints in a quart?
+   2
+385. What school does Harry Potter attend?
+   Hogwarts
+386. Who first walked on the moon?
+   Neil Armstrong
+387. What is the main component of natural gas?
+   Methane
+388. How many cards in a standard deck without jokers?
+   52
+389. Who is the Greek goddess of the hunt?
+   Artemis
+390. Which country is home to kangaroos?
+   Australia
+391. Who painted Guernica?
+   Picasso
+392. What is the deepest ocean trench?
+   Mariana Trench
+393. How many sides does a pentagon have?
+   5
+394. Who never grows up in the Barrie story?
+   Peter Pan
+395. Which NFL team plays in Foxborough?
+   New England Patriots
+396. Who wrote A Tale of Two Cities?
+   Charles Dickens
+397. What is copper’s symbol?
+   Cu
+398. How many zeros in a U.S. billion?
+   9
+399. What is Captain Kirk’s starship?
+   Enterprise
+400. What is Africa’s highest mountain?
+   Kilimanjaro
+401. Who sang “Hotel California”?
+   Eagles
+402. What is the largest big cat species?
+   Tiger
+403. Who invented the World Wide Web?
+   Tim Berners-Lee
+404. What is a caterpillar-to-butterfly change called?
+   Metamorphosis
+405. How many basketball players per team are on the court?
+   5
+406. Which sea does the Nile empty into?
+   Mediterranean
+407. Who wrote Walden?
+   Thoreau
+408. What is tin’s symbol?
+   Sn
+409. How many feet are in a mile?
+   5280
+410. Who holds up the sky in Greek myth?
+   Atlas
+411. Who directed The Godfather?
+   Francis Ford Coppola
+412. What is the largest rodent?
+   Capybara
+413. How many original U.S. colonies were there?
+   13
+414. What sword is pulled from the stone in Arthurian legend?
+   Excalibur
+415. Which planet is paired with Neptune as an ice giant?
+   Uranus
+416. Who sang “Sweet Child o’ Mine”?
+   Guns N’ Roses
+417. What is the study of insects?
+   Entomology
+418. How many strings does a ukulele usually have?
+   4
+419. Who is the Roman messenger god?
+   Mercury
+420. Which state is the Evergreen State?
+   Washington
+421. What is zinc’s symbol?
+   Zn
+422. How many seconds are in an hour?
+   3600
+423. Who is the elf archer in the Fellowship?
+   Legolas
+424. What trophy is the Claret Jug?
+   The Open Championship
+425. What is Earth’s number of moons?
+   1
+426. Who is the Greek goddess of love?
+   Aphrodite
+427. Who wrote Slaughterhouse-Five?
+   Kurt Vonnegut
+428. What is neon’s symbol?
+   Ne
+429. How many milligrams in a gram?
+   1000
+430. What current warms Western Europe?
+   Gulf Stream
+431. Who sang “Bohemian Rhapsody”?
+   Queen
+432. What is the largest penguin?
+   Emperor penguin
+433. How many points to win a modern table tennis game?
+   11
+434. What is the Norse hall of the slain?
+   Valhalla
+435. What is the hardest substance in a tooth?
+   Enamel
+436. How many ounces in a half gallon?
+   64
+437. What river runs through Paris?
+   Seine
+438. Who wrote Beloved?
+   Toni Morrison
+439. What is iodine’s symbol?
+   I
+440. How many sides does a trapezoid have?
+   4
+441. Who is the Greek god of wine?
+   Dionysus
+442. Which country is the origin of pizza?
+   Italy
+443. What is often called the fastest fish?
+   Sailfish
+444. How many stars were on the first U.S. flag?
+   13
+445. What does the Scarecrow want in Oz?
+   A brain
+446. Which Earth layer is liquid metal?
+   Outer core
+447. Who sang “Dancing Queen”?
+   ABBA
+448. How many periods are in a hockey game?
+   3
+449. Who is the Roman king of the gods?
+   Jupiter
+450. Who wrote The Bell Jar?
+   Sylvia Plath
+451. What is argon’s symbol?
+   Ar
+452. How many quarts in a gallon?
+   4
+453. What strait separates Spain and Morocco?
+   Strait of Gibraltar
+454. Who flew the first successful airplane with his brother?
+   Wright brothers
+455. What is the largest deer species?
+   Moose
+456. Who wrote The Color Purple?
+   Alice Walker
+457. What is uranium’s symbol?
+   U
+458. How many nickels in a dollar?
+   20
+459. Who is the princess in The Little Mermaid?
+   Ariel
+460. What desert is in southern Africa?
+   Kalahari
+461. Who sang “Like a Rolling Stone”?
+   Bob Dylan
+462. What is the tallest tree species commonly cited?
+   Coast redwood
+463. How many bases are on a baseball diamond?
+   4
+464. Who is the Roman hearth goddess?
+   Vesta
+465. Who wrote Catch-22?
+   Joseph Heller
+466. What is platinum’s symbol?
+   Pt
+467. How many dimes in a dollar?
+   10
+468. What mountain range divides France and Spain?
+   Pyrenees
+469. Who directed Casablanca?
+   Michael Curtiz
+470. What is the largest living lizard?
+   Komodo dragon
+471. Who ferries the dead in Greek myth?
+   Charon
+472. Who wrote The Handmaid’s Tale?
+   Margaret Atwood
+473. What is calcium’s symbol?
+   Ca
+474. How many pints in a gallon?
+   8
+475. Which canal links the Atlantic and Pacific?
+   Panama Canal
+476. Who had the hit “Respect”?
+   Aretha Franklin
+477. What is the smallest bird?
+   Bee hummingbird
+478. How many water polo players per team are in the pool?
+   7
+479. What is the Norse world tree?
+   Yggdrasil
+480. Who wrote The Road?
+   Cormac McCarthy
+481. What is magnesium’s symbol?
+   Mg
+482. How many tablespoons in a cup?
+   16
+483. Who is Simba’s father?
+   Mufasa
+484. Who invented basketball?
+   James Naismith
+485. What company makes the Kindle?
+   Amazon
+486. What is the name of the Greek hero of the Iliad’s wrath?
+   Achilles
+487. How many teaspoons in a fluid ounce?
+   6
+488. What is silicon’s symbol?
+   Si
+489. Who wrote The Grapes of Wrath?
+   John Steinbeck
+490. What is the largest U.S. city by population?
+   New York City
+491. How many ounces in a U.S. pint?
+   16
+492. What is chlorine’s symbol?
+   Cl
+493. Who painted the Birth of Venus?
+   Botticelli
+494. What is the name of Dorothy’s farm in Kansas, the family name?
+   Gale
+495. How many players on a rugby union team?
+   15
+496. What is nickel’s symbol?
+   Ni
+497. Who wrote Emma?
+   Jane Austen
+498. What is the largest U.K. country by area?
+   England
+499. How many cents in a quarter?
+   25
+500. What is fluorine’s symbol?
+   F

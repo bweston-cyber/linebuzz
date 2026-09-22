@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1020" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>LineBuzz — Host-controlled buzzers</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --bg2: #121933;
+      --card: #171e36;
+      --line: #2a3358;
+      --gold: #e8c36a;
+      --gold2: #f3dc9b;
+      --red: #e11d2e;
+      --red2: #ff4d5a;
+      --green: #1db954;
+      --muted: #9aa3c7;
+      --text: #f4f6ff;
+      --shadow: 0 12px 40px rgba(0,0,0,.35);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif; }
+    body {
+      background:
+        radial-gradient(1200px 600px at 50% -10%, #2a1f55 0%, transparent 55%),
+        radial-gradient(800px 400px at 100% 100%, #1a2a4a 0%, transparent 50%),
+        var(--bg);
+      padding: max(16px, env(safe-area-inset-top)) 16px 28px;
+    }
+    .wrap { max-width: 430px; margin: 0 auto; }
+    h1 { font-size: 1.7rem; letter-spacing: .04em; margin: 8px 0 4px; }
+    .tag { color: var(--gold); font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; }
+    .sub { color: var(--muted); margin: 0 0 22px; line-height: 1.45; }
+    .card {
+      background: linear-gradient(180deg, #1c2444, var(--card));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+    }
+    label { display: block; font-size: .8rem; color: var(--muted); margin: 10px 0 6px; }
+    input {
+      width: 100%; padding: 14px 14px; border-radius: 12px; border: 1px solid var(--line);
+      background: #0e1428; color: var(--text); font-size: 1.05rem;
+    }
+    input:focus { outline: 2px solid var(--gold); }
+    .row { display: flex; gap: 10px; }
+    .row > * { flex: 1; }
+    button {
+      appearance: none; border: 0; cursor: pointer; font-weight: 700;
+      letter-spacing: .03em; border-radius: 14px; padding: 14px 16px; font-size: 1rem;
+    }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-gold { background: linear-gradient(#f3dc9b, var(--gold)); color: #2a1d00; }
+    .btn-ghost { background: #232c4e; color: var(--text); border: 1px solid var(--line); }
+    .btn-green { background: linear-gradient(#34d36a, var(--green)); color: #06210e; }
+    .btn-red { background: linear-gradient(#ff5b68, var(--red)); color: white; }
+    .btn-navy { background: #2a3358; color: white; }
+    .code {
+      font-size: 2.4rem; letter-spacing: .28em; text-align: center; font-weight: 800;
+      color: var(--gold2); margin: 8px 0 4px;
+    }
+    .hint { text-align: center; color: var(--muted); font-size: .85rem; }
+    .players { list-style: none; padding: 0; margin: 0; }
+    .players li {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 12px; border-bottom: 1px solid #243056;
+      border-radius: 10px; margin: 4px 0;
+    }
+    .players li:last-child { border-bottom: 0; }
+    .players li.offline {
+      background: #5a1218;
+      border: 1px solid #c43b46;
+    }
+    .players li.offline .name { color: #ffd5d8; }
+    #discBanner {
+      display: none; background: #8b121c; border: 2px solid #ff5b68; color: #fff;
+      text-align: center; padding: 16px 12px; border-radius: 14px; margin-bottom: 12px;
+      font-weight: 800; font-size: 1.15rem; line-height: 1.35;
+    }
+    #discBanner.show { display: block; }
+    #playerControls.cut { outline: 3px solid #e11d2e; }
+    .pill.warn { background: #7a1b22; color: #ffd0d3; }
+    .name { font-weight: 700; }
+    .score { color: var(--gold); font-variant-numeric: tabular-nums; font-size: 1.15rem; }
+    .pill {
+      display: inline-block; font-size: .7rem; padding: 3px 8px; border-radius: 999px;
+      background: #2a3358; color: var(--gold2); margin-left: 8px; letter-spacing: .04em;
+    }
+    .status {
+      text-align: center; padding: 12px; border-radius: 12px; margin: 10px 0 14px;
+      background: #10172c; border: 1px dashed var(--line); min-height: 52px;
+      display: flex; align-items: center; justify-content: center; font-size: 1.05rem;
+    }
+    .status.live { border-color: var(--green); color: #8dffb4; }
+    .status.locked { border-color: var(--gold); color: var(--gold2); background: #2a220c; }
+    .buzzer {
+      width: 100%; height: 210px; border-radius: 50% / 46%;
+      background:
+        radial-gradient(circle at 50% 30%, #ff8a93, var(--red) 42%, #8c0d18 78%);
+      color: white; font-size: 2rem; letter-spacing: .12em; text-transform: uppercase;
+      box-shadow: 0 16px 0 #6b0b12, 0 22px 30px rgba(0,0,0,.4);
+      margin: 10px 0 18px;
+    }
+    .buzzer:active:not(:disabled) { transform: translateY(8px); box-shadow: 0 8px 0 #6b0b12; }
+    .buzzer:disabled {
+      background: radial-gradient(circle at 50% 30%, #6b738e, #3a415c 60%);
+      box-shadow: 0 10px 0 #23283c; color: #c5c9d8;
+    }
+    .winner { font-size: 1.35rem; color: var(--gold2); text-align: center; margin: 6px 0 12px; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .actions .span { grid-column: 1 / -1; }
+    .hidden { display: none !important; }
+    .note { font-size: .78rem; color: var(--muted); line-height: 1.4; margin-top: 10px; }
+    .toast {
+      position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
+      background: #111; color: white; padding: 10px 14px; border-radius: 10px;
+      font-size: .85rem; opacity: 0; pointer-events: none; transition: opacity .25s;
+      border: 1px solid #333;
+    }
+    .toast.show { opacity: 1; }
+    a { color: var(--gold); }
+    .host-q textarea {
+      width: 100%; min-height: 72px; border-radius: 12px; border: 1px solid var(--line);
+      background: #0e1428; color: var(--text); padding: 12px; font-size: 1rem; resize: vertical;
+    }
+    .tiny { font-size: .75rem; color: var(--muted); text-align: center; margin-top: 16px; }
+    #buzzFlash {
+      position: fixed; inset: 0; background: #e11d2e; opacity: 0; pointer-events: none;
+      z-index: 80; transition: opacity .05s linear;
+    }
+    #buzzFlash.on { opacity: .82; }
+    #qrModal {
+      position: fixed; inset: 0; background: rgba(5,8,18,.92); z-index: 90;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 24px; gap: 14px;
+    }
+    #qrModal img {
+      width: min(86vw, 360px); height: auto; background: #fff; padding: 14px;
+      border-radius: 16px;
+    }
+    #qrModal .qr-url {
+      color: var(--gold2); font-size: .85rem; text-align: center; word-break: break-all;
+      max-width: 360px;
+    }
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .tabs button { background: #232c4e; color: var(--muted); border: 1px solid var(--line); }
+    .tabs button.on { background: linear-gradient(#f3dc9b, var(--gold)); color: #2a1d00; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="tag">Game show buzzers</div>
+    <h1>LineBuzz</h1>
+    <p class="sub">One host phone. Friends join a room, wait for you to arm the buzzers, and the first tap locks the room.</p>
+
+    <section id="home" class="card">
+      <label for="displayName">Your name</label>
+      <input id="displayName" maxlength="20" placeholder="Alex" autocomplete="nickname" />
+      <div class="row" style="margin-top:16px">
+        <button class="btn-gold" id="createBtn">Create room</button>
+        <button class="btn-ghost" id="showJoinBtn">Join room</button>
+      </div>
+      <div id="joinBox" class="hidden" style="margin-top:12px">
+        <label for="roomInput">Room code</label>
+        <input id="roomInput" maxlength="6" placeholder="K7P2" autocapitalize="characters" />
+        <button class="btn-gold" id="joinBtn" style="width:100%;margin-top:12px">Join</button>
+      </div>
+      <p class="note">Works in the phone browser — no app install. Everyone needs the same room code. Stay on this page while you play.</p>
+    </section>
+
+    <section id="game" class="hidden">
+      <div class="card">
+        <div class="tag" id="roleTag">ROOM</div>
+        <div class="code" id="roomCode">————</div>
+        <p class="hint" id="shareHint">Share this code with your friends</p>
+      </div>
+
+      <div id="hostTabs" class="tabs hidden">
+        <button type="button" id="tabSetup" class="on">Setup</button>
+        <button type="button" id="tabPlay">Play</button>
+      </div>
+
+      <div id="hostSetup" class="card hidden">
+        <div class="tag">Setup</div>
+        <p class="hint" style="text-align:left">Players appear below as they join. Start a fresh code anytime.</p>
+        <div class="actions" style="margin-top:12px">
+          <button class="btn-gold span" id="newRoomBtn">Create new room code</button>
+          <button class="btn-ghost span" id="qrBtn">Show QR code</button>
+        </div>
+        <div class="host-q" style="margin-top:8px">
+          <label for="packSelect">Question packs in /questions (optional)</label>
+          <div class="row">
+            <select id="packSelect" style="width:100%;padding:14px;border-radius:12px;border:1px solid var(--line);background:#0e1428;color:var(--text);font-size:1rem">
+              <option value="">— choose a file —</option>
+            </select>
+            <button class="btn-ghost" id="refreshPacksBtn" type="button">Refresh</button>
+          </div>
+          <label for="localPack" style="margin-top:10px">Or pick a file off this phone</label>
+          <input id="localPack" type="file" accept=".txt,.json,.md,.csv" />
+          <div class="row" style="margin-top:10px">
+            <div>
+              <label for="startQ">Start at #</label>
+              <input id="startQ" type="number" min="1" value="1" />
+            </div>
+            <div>
+              <label for="askLimit">Ask how many</label>
+              <input id="askLimit" type="number" min="1" value="20" />
+            </div>
+          </div>
+          <label class="hint" style="display:flex;gap:8px;align-items:center;margin-top:10px">
+            <input id="skipAsked" type="checkbox" checked style="width:auto" />
+            Skip questions already asked on this phone
+          </label>
+          <div class="row" style="margin-top:8px">
+            <button class="btn-ghost" id="saveAskedBtn" type="button">Save asked list</button>
+            <button class="btn-ghost" id="clearAskedBtn" type="button">Clear asked list</button>
+          </div>
+          <p class="hint" id="packStatus" style="text-align:left;margin:8px 0 0">Packs are optional. Players never see questions.</p>
+        </div>
+      </div>
+
+      <div id="hostPlay" class="card hidden">
+        <div class="status" id="status">Connecting…</div>
+        <div class="winner hidden" id="winner"></div>
+        <div class="host-q">
+          <div id="qaCard" class="status" style="display:block;text-align:left;margin-top:4px">
+            <div class="tag" id="qaIndex">Question</div>
+            <p id="qaQ" style="margin:8px 0 6px;font-size:1.15rem;color:#fff"></p>
+            <p id="qaA" style="margin:0;color:var(--gold2)"></p>
+          </div>
+        </div>
+        <div class="actions" style="margin-top:12px">
+          <button class="btn-navy span" id="nextQBtn">Go to next question</button>
+          <button class="btn-gold span" id="armBtn">Activate buzzers</button>
+          <button class="btn-green" id="correctBtn" disabled>Correct +1</button>
+          <button class="btn-red" id="wrongBtn" disabled>Wrong −1</button>
+          <button class="btn-ghost span" id="resetBtn">Clear lock (same question)</button>
+        </div>
+      </div>
+
+      <div id="playerControls" class="card hidden">
+        <div id="discBanner">DISCONNECTED<br><span style="font-weight:600;font-size:.9rem">Reconnecting — stay on this screen</span></div>
+        <div class="status" id="playerStatus"></div>
+        <button class="buzzer" id="buzzBtn" disabled>BUZZ</button>
+        <p class="hint" id="playerHint">Wait for the host to activate buzzers</p>
+      </div>
+
+      <div class="card" id="boardCard">
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <strong>Players & scores</strong>
+          <span class="hint" id="connHint"></span>
+        </div>
+        <ul class="players" id="playerList"></ul>
+      </div>
+
+      <button class="btn-ghost" id="leaveBtn" style="width:100%">Leave room</button>
+      <p class="tiny">Uses a shared room channel (not phone-to-phone). Switching apps is OK — come back to this tab and the list will catch up.</p>
+    </section>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div id="buzzFlash" aria-hidden="true"></div>
+  <div id="qrModal" class="hidden">
+    <div class="tag">Scan to join</div>
+    <img id="qrImg" alt="Room QR code" />
+    <div class="code" id="qrCodeLabel" style="font-size:1.8rem;letter-spacing:.2em"></div>
+    <p class="qr-url" id="qrUrl"></p>
+    <button class="btn-gold" id="qrClose" type="button" style="min-width:200px">Close</button>
+  </div>
+  <input id="hapticSwitch" type="checkbox" switch style="position:fixed;left:-80px;top:-80px;opacity:0;width:44px;height:28px">
+
+  <script type="module">
+    import mqtt from 'https://cdn.jsdelivr.net/npm/mqtt@5.14.1/+esm';
+
+    const APP = 'lbw26';
+    const HEARTBEAT_MS = 1500;
+    const STALE_MS = 5000;
+    const BROKERS = [
+      'wss://broker.emqx.io:8084/mqtt',
+      'wss://broker.hivemq.com:8884/mqtt'
+    ];
+    const $ = id => document.getElementById(id);
+    const home = $('home');
+    const game = $('game');
+    const toastEl = $('toast');
+
+    function uid() {
+      let id = localStorage.getItem('linebuzz-id');
+      if (!id) {
+        id = Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+        localStorage.setItem('linebuzz-id', id);
+      }
+      return id;
+    }
+    const selfId = uid();
+
+    let client = null;
+    let isHost = false;
+    let myName = '';
+    let roomId = '';
+    let syncTimer = null;
+    let pack = [];
+    let packIndex = -1;
+    let packName = '';
+    let askedRound = 0;
+    let lastHostBeat = 0;
+    let brokerOk = false;
+    let audioCtx = null;
+
+    function armAlert() {
+      try {
+        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+      } catch {}
+      try { navigator.vibrate?.(1); } catch {}
+      try { $('hapticSwitch').click(); } catch {}
+    }
+
+    function pingHost() {
+      const flash = $('buzzFlash');
+      flash.classList.add('on');
+      setTimeout(() => flash.classList.remove('on'), 220);
+      setTimeout(() => { flash.classList.add('on'); setTimeout(() => flash.classList.remove('on'), 180); }, 280);
+      try { navigator.vibrate?.([80, 40, 80, 40, 200]); } catch {}
+      try {
+        const sw = $('hapticSwitch');
+        sw.checked = !sw.checked;
+        sw.click();
+      } catch {}
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const beep = (freq, start, dur) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'square';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0.0001, audioCtx.currentTime + start);
+          gain.gain.exponentialRampToValueAtTime(0.16, audioCtx.currentTime + start + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + start + dur);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(audioCtx.currentTime + start);
+          osc.stop(audioCtx.currentTime + start + dur + 0.02);
+        };
+        beep(880, 0, 0.16);
+        beep(1174, 0.18, 0.22);
+      } catch {}
+    }
+
+    function emptyState() {
+      return {
+        hostId: null,
+        hostName: '',
+        started: false,
+        phase: 'lobby',
+        firstBuzzId: null,
+        firstBuzzName: null,
+        lastResult: null,
+        lockedOut: [],
+        players: {},
+        beat: 0
+      };
+    }
+    let state = emptyState();
+
+    function toast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      setTimeout(() => toastEl.classList.remove('show'), 2200);
+    }
+    function makeCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let s = '';
+      for (let i = 0; i < 4; i++) s += chars[Math.floor(Math.random() * chars.length)];
+      return s;
+    }
+    function setStatus(text, kind) {
+      ['status', 'playerStatus'].forEach(id => {
+        const el = $(id);
+        if (!el) return;
+        el.textContent = text;
+        el.className = 'status' + (kind ? ' ' + kind : '');
+      });
+    }
+
+    function setHostTab(which) {
+      const setup = which === 'setup';
+      $('tabSetup').classList.toggle('on', setup);
+      $('tabPlay').classList.toggle('on', !setup);
+      $('hostSetup').classList.toggle('hidden', !isHost || !setup);
+      $('hostPlay').classList.toggle('hidden', !isHost || setup);
+    }
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function topic(kind) { return APP + '/' + roomId + '/' + kind; }
+
+    function joinUrl() {
+      const url = new URL(location.href);
+      url.search = '';
+      url.hash = '';
+      url.searchParams.set('room', roomId);
+      return url.toString();
+    }
+
+    function showQr() {
+      if (!roomId) return;
+      const url = joinUrl();
+      $('qrUrl').textContent = url;
+      $('qrCodeLabel').textContent = roomId;
+      $('qrImg').src = 'https://api.qrserver.com/v1/create-qr-code/?size=360x360&margin=8&data=' + encodeURIComponent(url);
+      $('qrModal').classList.remove('hidden');
+    }
+
+    function publish(kind, payload, retain) {
+      if (!client || !brokerOk) return;
+      client.publish(topic(kind), JSON.stringify(payload), { qos: 1, retain: !!retain });
+    }
+
+    function saveSession() {
+      sessionStorage.setItem('linebuzz', JSON.stringify({
+        role: isHost ? 'host' : 'player',
+        roomId, name: myName,
+        state: isHost ? state : null
+      }));
+    }
+
+    function render() {
+      $('roomCode').textContent = roomId;
+      const list = $('playerList');
+      const entries = Object.entries(state.players);
+      if (!entries.length) {
+        list.innerHTML = '<li><span class="name">Waiting for players…</span></li>';
+      } else {
+        const sorted = entries.sort((a, b) => b[1].score - a[1].score || a[1].name.localeCompare(b[1].name));
+        list.innerHTML = sorted.map(([id, p]) => {
+          const isThisHost = id === state.hostId;
+          const seen = isThisHost ? (state.beat || p.seen || 0) : (p.seen || 0);
+          const live = isThisHost
+            ? (isHost ? brokerOk : (lastHostBeat && Date.now() - lastHostBeat < STALE_MS))
+            : (id === selfId ? brokerOk : (seen && Date.now() - seen < STALE_MS));
+          const you = id === selfId ? ' <span class="pill">YOU</span>' : '';
+          const host = isThisHost ? ' <span class="pill">HOST</span>' : '';
+          const buzzed = state.firstBuzzId === id ? ' <span class="pill">BUZZED</span>' : '';
+          const disc = live ? '' : ' <span class="pill warn">DISCONNECTED</span>';
+          return `<li class="${live ? '' : 'offline'}"><span class="name">${escapeHtml(p.name)}${host}${you}${buzzed}${disc}</span><span class="score">${p.score}</span></li>`;
+        }).join('');
+      }
+
+      const named = Object.keys(state.players).filter(id => id !== state.hostId);
+      const livePlayers = named.filter(id => state.players[id].seen && Date.now() - state.players[id].seen < STALE_MS).length;
+      const hostAge = lastHostBeat ? Math.round((Date.now() - lastHostBeat) / 1000) : null;
+      const hostLive = lastHostBeat && hostAge * 1000 < STALE_MS;
+      if (isHost) {
+        $('connHint').textContent = brokerOk
+          ? (livePlayers + ' live / ' + named.length + ' joined')
+          : 'Connecting…';
+      } else {
+        $('connHint').textContent = hostLive
+          ? ('Host connected · ' + (state.hostName || 'host'))
+          : (brokerOk ? 'Looking for host…' : 'Connecting…');
+      }
+
+      const winner = $('winner');
+      if (state.phase === 'locked' && state.firstBuzzName) {
+        winner.classList.remove('hidden');
+        winner.textContent = state.firstBuzzName + ' buzzed first!';
+      } else if (state.lastResult) {
+        winner.classList.remove('hidden');
+        winner.textContent = state.lastResult;
+      } else {
+        winner.classList.add('hidden');
+      }
+
+      if (isHost) {
+        $('correctBtn').disabled = state.phase !== 'locked';
+        $('wrongBtn').disabled = state.phase !== 'locked';
+        $('armBtn').disabled = state.phase === 'live';
+        if (!brokerOk) setStatus('Connecting to room channel…');
+        else if (state.phase === 'lobby') setStatus('Players can join. You will see them below as they appear.');
+        else if (state.phase === 'idle') setStatus('Ask your question out loud, then activate buzzers.');
+        else if (state.phase === 'live') setStatus(
+          (state.lastResult ? state.lastResult + ' Buzzers live again.' : 'Buzzers are LIVE. First tap wins the lock.'),
+          'live'
+        );
+        else if (state.phase === 'locked') setStatus('Locked. Hear their answer, then mark correct or wrong.', 'locked');
+      } else {
+        const lockedOut = (state.lockedOut || []).includes(selfId);
+        const armed = state.phase === 'live' && !lockedOut;
+        $('buzzBtn').disabled = !armed || !hostLive;
+        const cut = !brokerOk || !hostLive;
+        $('discBanner').classList.toggle('show', cut);
+        $('playerControls').classList.toggle('cut', cut);
+        if (!brokerOk) {
+          setStatus('DISCONNECTED — reconnecting…');
+          $('playerHint').textContent = 'Stay on LineBuzz. Do not switch apps.';
+        } else if (!hostLive) {
+          setStatus('DISCONNECTED from host — reconnecting…');
+          $('playerHint').textContent = 'Stay on this screen until this banner goes away';
+        } else if (state.phase === 'lobby' || state.phase === 'idle') {
+          setStatus('Connected to ' + (state.hostName || 'host') + '. Buzzers are off.');
+          $('playerHint').textContent = 'Wait for the host to activate buzzers';
+        } else if (state.phase === 'live') {
+          if (lockedOut) {
+            setStatus('You are locked out this question', 'locked');
+            $('playerHint').textContent = 'Wait for the next question';
+          } else {
+            setStatus('BUZZERS ARE LIVE', 'live');
+            $('playerHint').textContent = 'Hit BUZZ if you know it';
+          }
+        } else if (state.phase === 'locked') {
+          const mine = state.firstBuzzId === selfId;
+          setStatus(mine ? 'You buzzed first — answer out loud!' : (state.firstBuzzName || 'Someone') + ' locked the buzzer.', 'locked');
+          $('playerHint').textContent = mine ? 'Give your answer to the host' : 'Wait for the next question';
+        }
+      }
+    }
+
+    function broadcastState() {
+      if (!isHost) return;
+      state.beat = Date.now();
+      state.hostId = selfId;
+      state.hostName = myName;
+      if (state.players[selfId]) state.players[selfId].seen = Date.now();
+      publish('state', state, true);
+      saveSession();
+    }
+
+    function applyState(next) {
+      if (!next || !next.players) return;
+      state = next;
+      lastHostBeat = next.beat || Date.now();
+      render();
+    }
+
+    function handleHello(data) {
+      if (!isHost || !data || !data.id || data.id === selfId) return;
+      const name = String(data.name || 'Player').slice(0, 20);
+      const existed = !!state.players[data.id];
+      if (!existed) {
+        state.players[data.id] = { name, score: 0 };
+        if (state.phase === 'lobby') state.phase = 'idle';
+        toast(name + ' joined');
+      } else {
+        state.players[data.id].name = name;
+        state.players[data.id].seen = Date.now();
+      }
+      state.players[data.id].seen = Date.now();
+      broadcastState();
+      render();
+    }
+
+    function handleBuzz(data) {
+      if (!isHost || state.phase !== 'live') return;
+      const id = data && data.id;
+      const p = id && state.players[id];
+      if (!p) return;
+      if ((state.lockedOut || []).includes(id)) return;
+      state.phase = 'locked';
+      state.firstBuzzId = id;
+      state.firstBuzzName = p.name;
+      state.lastResult = null;
+      broadcastState();
+      render();
+      pingHost();
+    }
+
+    function announce() {
+      if (isHost) broadcastState();
+      else publish('hello', { id: selfId, name: myName, t: Date.now() }, false);
+    }
+
+    function connectMqtt(onReady) {
+      let i = 0;
+      const tryBroker = () => {
+        const url = BROKERS[i];
+        setStatus('Connecting…');
+        client = mqtt.connect(url, {
+          clientId: 'lb-' + selfId + '-' + Math.random().toString(36).slice(2, 6),
+          clean: true,
+          reconnectPeriod: 1500,
+          connectTimeout: 8000,
+          keepalive: 20
+        });
+        client.on('connect', () => {
+          brokerOk = true;
+          client.subscribe([topic('state'), topic('hello'), topic('buzz')], { qos: 1 }, () => onReady());
+        });
+        client.on('reconnect', () => { brokerOk = false; render(); });
+        client.on('close', () => { brokerOk = false; render(); });
+        client.on('error', () => {});
+        client.on('message', (t, buf) => {
+          let data;
+          try { data = JSON.parse(buf.toString()); } catch { return; }
+          if (t.endsWith('/state')) {
+            if (!isHost) applyState(data);
+            else if (data && data.hostId && data.hostId !== selfId) {
+              /* ignore other host */
+            }
+          } else if (t.endsWith('/hello')) handleHello(data);
+          else if (t.endsWith('/buzz')) handleBuzz(data);
+        });
+        client.on('offline', () => {
+          brokerOk = false;
+          render();
+          if (i < BROKERS.length - 1 && !client.connected) {
+            i += 1;
+            try { client.end(true); } catch {}
+            tryBroker();
+          }
+        });
+      };
+      tryBroker();
+    }
+
+    function connect(code, hostMode) {
+      roomId = code.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+      if (roomId.length < 3) { toast('Enter a valid room code'); return; }
+      myName = ($('displayName').value || '').trim() || (hostMode ? 'Host' : 'Player');
+      isHost = hostMode;
+      home.classList.add('hidden');
+      game.classList.remove('hidden');
+      $('roleTag').textContent = isHost ? 'HOST ROOM' : 'PLAYER';
+      $('shareHint').textContent = isHost
+        ? 'Tell friends this code, or send: ' + location.origin + location.pathname + '?room=' + roomId
+        : 'Joining as ' + myName;
+      $('hostTabs').classList.toggle('hidden', !isHost);
+      $('playerControls').classList.toggle('hidden', isHost);
+      if (isHost) setHostTab('setup');
+      else {
+        $('hostSetup').classList.add('hidden');
+        $('hostPlay').classList.add('hidden');
+      }
+      setStatus('Connecting to room…');
+
+      if (isHost) {
+        const saved = (() => { try { return JSON.parse(sessionStorage.getItem('linebuzz') || '{}'); } catch { return {}; } })();
+        if (saved.state && saved.roomId === roomId && saved.state.players) state = saved.state;
+        else {
+          state = emptyState();
+          state.phase = 'lobby';
+        }
+        state.hostId = selfId;
+        state.hostName = myName;
+        state.players[selfId] = { name: myName, score: (state.players[selfId] && state.players[selfId].score) || 0 };
+      }
+
+      const startLoop = () => {
+        announce();
+        render();
+        if (syncTimer) clearInterval(syncTimer);
+        syncTimer = setInterval(() => { announce(); render(); }, HEARTBEAT_MS);
+      };
+
+      connectMqtt(startLoop);
+
+      const url = new URL(location.href);
+      url.searchParams.set('room', roomId);
+      history.replaceState({}, '', url);
+      saveSession();
+      if (isHost) listQuestionFiles();
+      else toast('Joining ' + roomId);
+    }
+
+    function resumeLink() {
+      lastHostBeat = 0;
+      if (!isHost) render();
+      if (!roomId) return;
+      if (client && client.connected) {
+        announce();
+        return;
+      }
+      try { client && client.reconnect && client.reconnect(); } catch {}
+      if (!client || !client.connected) {
+        try { client && client.end(true); } catch {}
+        connectMqtt(() => { announce(); render(); });
+      }
+      announce();
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        lastHostBeat = 0;
+        brokerOk = false;
+      } else {
+        resumeLink();
+      }
+      render();
+    });
+    window.addEventListener('focus', resumeLink);
+    window.addEventListener('pageshow', resumeLink);
+
+    function parsePack(text, url) {
+      const items = [];
+      const trimmed = (text || '').trim();
+      if (!trimmed) return items;
+      if ((url || '').endsWith('.json') || trimmed[0] === '[' || trimmed[0] === '{') {
+        try {
+          const data = JSON.parse(trimmed);
+          const arr = Array.isArray(data) ? data : (data.questions || data.items || []);
+          arr.forEach(row => {
+            const q = row.q || row.question || row.prompt;
+            const a = row.a || row.answer || row.ans;
+            if (q && a) items.push({ q: String(q).trim(), a: String(a).trim() });
+          });
+          return items;
+        } catch {}
+      }
+      let pendingQ = null;
+      trimmed.split(/\r?\n/).forEach(raw => {
+        const line = raw.trim();
+        if (!line) return;
+        const numbered = line.match(/^\d+\.\s*(.+)$/);
+        if (numbered) {
+          if (pendingQ) items.push({ q: pendingQ, a: '' });
+          pendingQ = numbered[1].trim();
+          return;
+        }
+        if (/^(q|question)\s*[:.-]\s*/i.test(line)) {
+          if (pendingQ) items.push({ q: pendingQ, a: '' });
+          pendingQ = line.replace(/^(q|question)\s*[:.-]\s*/i, '').trim();
+          return;
+        }
+        if (/^(a|answer)\s*[:.-]\s*/i.test(line)) {
+          const a = line.replace(/^(a|answer)\s*[:.-]\s*/i, '').trim();
+          if (pendingQ) { items.push({ q: pendingQ, a }); pendingQ = null; }
+          return;
+        }
+        if (pendingQ && !line.match(/^(MOVIES|MUSIC|SPORTS|GEOGRAPHY|HISTORY|SCIENCE|FOOD|BIBLE|ODDS|LINEBUZZ|Host only)/i)) {
+          items.push({ q: pendingQ, a: line });
+          pendingQ = null;
+        }
+      });
+      return items.filter(x => x.q && x.a);
+    }
+    function askedKey() {
+      return 'linebuzz-asked:' + (packName || 'default');
+    }
+    function loadAskedSet() {
+      try { return new Set(JSON.parse(localStorage.getItem(askedKey()) || '[]')); }
+      catch { return new Set(); }
+    }
+    function saveAskedSet(set) {
+      localStorage.setItem(askedKey(), JSON.stringify([...set]));
+    }
+    function markAsked(idx) {
+      if (idx < 0) return;
+      const set = loadAskedSet();
+      set.add(idx);
+      saveAskedSet(set);
+    }
+    function showQA() {
+      if (!isHost) return;
+      if (!pack.length) {
+        $('qaIndex').textContent = 'No pack';
+        $('qaQ').textContent = 'Optional: choose a file from /questions';
+        $('qaA').textContent = '';
+        return;
+      }
+      if (packIndex < 0 || packIndex >= pack.length) {
+        $('qaIndex').textContent = pack.length + ' questions loaded';
+        $('qaQ').textContent = 'Tap “Go to next question” to start.';
+        $('qaA').textContent = '';
+        return;
+      }
+      const item = pack[packIndex];
+      const limit = Math.max(1, parseInt($('askLimit').value || '0', 10) || pack.length);
+      $('qaIndex').textContent = 'Q ' + (packIndex + 1) + ' of ' + pack.length + ' · this game ' + askedRound + '/' + limit + ' — host only';
+      $('qaQ').textContent = item.q;
+      $('qaA').textContent = 'Answer: ' + item.a;
+      markAsked(packIndex);
+    }
+    function applyPack(text, label) {
+      pack = parsePack(text, label || '');
+      packName = (label || '').split('/').pop();
+      askedRound = 0;
+      const start = Math.max(1, parseInt($('startQ').value || '1', 10)) - 1;
+      packIndex = pack.length ? Math.min(start, pack.length - 1) : -1;
+      if (packIndex >= 0) askedRound = 1;
+      $('packStatus').textContent = pack.length
+        ? ('Loaded ' + pack.length + ' from ' + packName + ' · starting at #' + (packIndex + 1))
+        : ('No questions parsed from ' + label);
+      showQA();
+    }
+    async function loadPack(path) {
+      const url = path.replace(/^\//, '');
+      try {
+        const res = await fetch(url + '?t=' + Date.now());
+        if (!res.ok) throw new Error('missing');
+        applyPack(await res.text(), url);
+      } catch {
+        $('packStatus').textContent = 'Could not load ' + url;
+      }
+    }
+    function fillPackSelect(names) {
+      const sel = $('packSelect');
+      const current = sel.value;
+      sel.innerHTML = '<option value="">— choose a file —</option>';
+      names.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = 'questions/' + name;
+        opt.textContent = name;
+        sel.appendChild(opt);
+      });
+      if (current) sel.value = current;
+    }
+    async function listQuestionFiles() {
+      const found = new Set(['linebuzz-starter-100.txt', 'general-500.txt']);
+      try {
+        const res = await fetch('questions/index.json?t=' + Date.now());
+        if (res.ok) {
+          const data = await res.json();
+          const arr = Array.isArray(data) ? data : (data.files || []);
+          arr.forEach(n => {
+            const name = String(n).replace(/^.*\//, '');
+            if (name && name !== 'index.json' && name !== 'asked.json') found.add(name);
+          });
+        }
+      } catch {}
+      try {
+        const res = await fetch('questions/?t=' + Date.now());
+        if (res.ok) {
+          const html = await res.text();
+          const re = /href=["']([^"']+)["']/gi;
+          let m;
+          while ((m = re.exec(html))) {
+            let href = m[1].split('?')[0].split('/').pop();
+            if (/\.(txt|json|md|csv)$/i.test(href) && href !== 'index.json' && href !== 'asked.json') found.add(href);
+          }
+        }
+      } catch {}
+      const names = [...found].sort();
+      fillPackSelect(names);
+      $('packStatus').textContent = names.length ? ('Packs: ' + names.join(', ')) : 'No /questions files found yet';
+    }
+    function goNextQuestion() {
+      if (!pack.length) { toast('Load a question file first'); return; }
+      const limit = Math.max(1, parseInt($('askLimit').value || '0', 10) || pack.length);
+      if (askedRound >= limit) {
+        toast('Reached ' + limit + ' questions for this game');
+        return;
+      }
+      const skip = $('skipAsked').checked;
+      const used = loadAskedSet();
+      let next = packIndex;
+      for (let i = 0; i < pack.length; i++) {
+        next = (next + 1) % pack.length;
+        if (!skip || !used.has(next) || next === packIndex) break;
+      }
+      packIndex = next;
+      askedRound += 1;
+      state.phase = 'idle';
+      state.firstBuzzId = null;
+      state.firstBuzzName = null;
+      state.lastResult = null;
+      state.lockedOut = [];
+      showQA();
+      broadcastState();
+      render();
+    }
+
+    $('createBtn').onclick = () => {
+      sessionStorage.removeItem('linebuzz');
+      connect(makeCode(), true);
+    };
+    $('newRoomBtn').onclick = () => {
+      sessionStorage.removeItem('linebuzz');
+      try { client && client.end(true); } catch {}
+      if (syncTimer) clearInterval(syncTimer);
+      state = emptyState();
+      connect(makeCode(), true);
+      setHostTab('setup');
+      toast('New room code');
+    };
+    $('tabSetup').onclick = () => setHostTab('setup');
+    $('tabPlay').onclick = () => setHostTab('play');
+    $('qrBtn').onclick = showQr;
+    $('qrClose').onclick = () => $('qrModal').classList.add('hidden');
+    $('qrModal').addEventListener('click', e => { if (e.target.id === 'qrModal') $('qrModal').classList.add('hidden'); });
+    $('showJoinBtn').onclick = () => $('joinBox').classList.toggle('hidden');
+    $('joinBtn').onclick = () => connect($('roomInput').value, false);
+    $('roomInput').addEventListener('keydown', e => { if (e.key === 'Enter') connect($('roomInput').value, false); });
+    $('armBtn').onclick = () => {
+      if (!isHost) return;
+      state.phase = 'live';
+      state.firstBuzzId = null;
+      state.firstBuzzName = null;
+      state.lastResult = null;
+      state.lockedOut = [];
+      state.started = true;
+      armAlert();
+      broadcastState();
+      render();
+    };
+    $('correctBtn').onclick = () => {
+      if (!isHost || state.phase !== 'locked' || !state.firstBuzzId) return;
+      const p = state.players[state.firstBuzzId];
+      if (p) p.score += 1;
+      state.lastResult = (p ? p.name : 'Player') + ' — correct!';
+      state.phase = 'idle';
+      state.firstBuzzId = null;
+      state.firstBuzzName = null;
+      broadcastState();
+      render();
+    };
+    $('wrongBtn').onclick = () => {
+      if (!isHost || state.phase !== 'locked') return;
+      const wrongId = state.firstBuzzId;
+      const p = wrongId ? state.players[wrongId] : null;
+      if (p) p.score -= 1;
+      if (!state.lockedOut) state.lockedOut = [];
+      if (wrongId && !state.lockedOut.includes(wrongId)) state.lockedOut.push(wrongId);
+      state.lastResult = (state.firstBuzzName || 'Player') + ' — incorrect (−1)';
+      state.phase = 'live';
+      state.firstBuzzId = null;
+      state.firstBuzzName = null;
+      broadcastState();
+      render();
+    };
+    $('resetBtn').onclick = () => {
+      if (!isHost) return;
+      state.phase = 'idle';
+      state.firstBuzzId = null;
+      state.firstBuzzName = null;
+      state.lastResult = null;
+      broadcastState();
+      render();
+    };
+    $('buzzBtn').onclick = () => {
+      if (state.phase !== 'live') return;
+      if ((state.lockedOut || []).includes(selfId)) return;
+      publish('buzz', { id: selfId, t: Date.now() }, false);
+      try { navigator.vibrate && navigator.vibrate(50); } catch {}
+      $('buzzBtn').disabled = true;
+    };
+    $('leaveBtn').onclick = () => {
+      sessionStorage.removeItem('linebuzz');
+      try { client && client.end(true); } catch {}
+      location.href = location.pathname;
+    };
+    $('refreshPacksBtn').onclick = () => listQuestionFiles();
+    $('packSelect').onchange = () => { if ($('packSelect').value) loadPack($('packSelect').value); };
+    $('localPack').onchange = async ev => {
+      const file = ev.target.files && ev.target.files[0];
+      if (file) applyPack(await file.text(), file.name);
+    };
+    $('nextQBtn').onclick = () => goNextQuestion();
+    $('saveAskedBtn').onclick = () => {
+      const payload = { [packName || 'pack']: [...loadAskedSet()].map(n => n + 1) };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'asked.json';
+      a.click();
+      toast('Downloaded asked.json');
+    };
+    $('clearAskedBtn').onclick = () => {
+      saveAskedSet(new Set());
+      toast('Cleared asked list for this pack');
+    };
+
+    const params = new URLSearchParams(location.search);
+    if (params.get('room')) {
+      $('roomInput').value = params.get('room').toUpperCase();
+      $('joinBox').classList.remove('hidden');
+    }
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('linebuzz') || 'null');
+      if (saved && saved.roomId && saved.role) {
+        $('displayName').value = saved.name || '';
+        connect(saved.roomId, saved.role === 'host');
+      }
+    } catch {}
+  </script>
+</body>
+</html>

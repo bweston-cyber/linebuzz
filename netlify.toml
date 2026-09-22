@@ -1,0 +1,3 @@
+# Static site. Connecting this repo in Netlify publishes on every push.
+[build]
+  publish = "."
