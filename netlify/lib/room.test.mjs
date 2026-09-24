@@ -50,6 +50,20 @@ test("correct scores and the same host keeps the score after rejoining", () => {
   assert.equal(again.room.players.p1.score, 1);
 });
 
+test("new game zeroes scores and keeps the players", () => {
+  let room = reduce(null, { type: "join", role: "host", id: "host", name: "Alex" }, now).room;
+  room = reduce(room, { type: "join", role: "player", id: "p1", name: "Sam" }, now).room;
+  room = reduce(room, { type: "arm", role: "host", id: "host" }, now).room;
+  room = reduce(room, { type: "buzz", role: "player", id: "p1" }, now).room;
+  room = reduce(room, { type: "correct", role: "host", id: "host" }, now).room;
+  room = reduce(room, { type: "newgame", role: "host", id: "host" }, now).room;
+  assert.equal(room.players.p1.score, 0);
+  assert.equal(room.players.host.score, 0);
+  assert.equal(room.phase, "idle");
+  assert.equal(room.firstBuzzId, null);
+  assert.ok(room.players.p1);
+});
+
 test("a second host cannot take a live room", () => {
   const room = reduce(null, { type: "join", role: "host", id: "host", name: "Alex" }, now).room;
   const stolen = reduce(room, { type: "join", role: "host", id: "other", name: "Pat" }, now + 1000);

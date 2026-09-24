@@ -187,9 +187,10 @@
 
       <div id="hostSetup" class="card hidden">
         <div class="tag">Setup</div>
-        <p class="hint" style="text-align:left">Players appear below as they join. Start a fresh code anytime.</p>
+        <p class="hint" style="text-align:left">A refresh keeps this room, the question pack, and the question you are on. New game clears the scores and starts that pack over.</p>
         <div class="actions" style="margin-top:12px">
-          <button class="btn-gold span" id="newRoomBtn">Create new room code</button>
+          <button class="btn-gold span" id="newGameBtn" type="button">New game</button>
+          <button class="btn-ghost span" id="newRoomBtn">Create new room code</button>
           <button class="btn-ghost span" id="qrBtn">Show QR code</button>
         </div>
         <div class="host-q" style="margin-top:8px">
@@ -633,8 +634,10 @@
       const url = new URL(location.href);
       url.searchParams.set('room', roomId);
       history.replaceState({}, '', url);
-      if (isHost) listQuestionFiles();
-      else toast('Joined ' + roomId);
+      if (isHost) {
+        await listQuestionFiles();
+        restoreHostDesk();
+      } else toast('Joined ' + roomId);
       poll(gen);
     }
 
@@ -724,6 +727,44 @@
       $('qaQ').textContent = item.q;
       $('qaA').textContent = 'Answer: ' + item.a;
       markAsked(packIndex);
+      saveHostDesk();
+    }
+    function deskKey() {
+      return 'linebuzz-desk:' + roomId;
+    }
+    function saveHostDesk() {
+      if (!isHost || !roomId) return;
+      try {
+        localStorage.setItem(deskKey(), JSON.stringify({
+          pack, packName, packIndex, askedRound,
+          askLimit: $('askLimit').value,
+          startQ: $('startQ').value,
+          skipAsked: $('skipAsked').checked,
+          grokCount: $('grokCount').value,
+          grokTheme: $('grokTheme').value
+        }));
+      } catch {}
+    }
+    function restoreHostDesk() {
+      if (!isHost || !roomId) return;
+      let saved = null;
+      try { saved = JSON.parse(localStorage.getItem(deskKey()) || 'null'); } catch { return; }
+      if (!saved || !Array.isArray(saved.pack) || !saved.pack.length) return;
+      pack = saved.pack.filter(item => item && item.q && item.a).map(item => ({ q: String(item.q), a: String(item.a) }));
+      if (!pack.length) return;
+      packName = saved.packName || '';
+      packIndex = Number.isFinite(saved.packIndex) ? saved.packIndex : -1;
+      askedRound = Number(saved.askedRound) || 0;
+      if (saved.askLimit) $('askLimit').value = saved.askLimit;
+      if (saved.startQ) $('startQ').value = saved.startQ;
+      if (saved.grokCount) $('grokCount').value = saved.grokCount;
+      if (typeof saved.grokTheme === 'string') $('grokTheme').value = saved.grokTheme;
+      $('skipAsked').checked = saved.skipAsked !== false;
+      const packPath = packName && packName !== 'grok' ? 'questions/' + packName : '';
+      if (packPath) $('packSelect').value = packPath;
+      $('packStatus').textContent = 'Back on ' + (packName || 'this pack') + ' · question ' + (packIndex >= 0 ? packIndex + 1 : 'not started') + ' of ' + pack.length;
+      showQA();
+      setHostTab('play');
     }
     function applyPack(text, label) {
       pack = parsePack(text, label || '');
@@ -786,7 +827,9 @@
       } catch {}
       const names = [...found].sort();
       fillPackSelect(names);
-      $('packStatus').textContent = names.length ? ('Packs: ' + names.join(', ')) : 'No /questions files found yet';
+      if (!pack.length) {
+        $('packStatus').textContent = names.length ? ('Packs: ' + names.join(', ')) : 'No /questions files found yet';
+      }
     }
     function goNextQuestion() {
       if (!pack.length) { toast('Load a question file first'); return; }
@@ -816,6 +859,20 @@
     $('createBtn').onclick = () => {
       sessionStorage.removeItem('linebuzz');
       connect(makeCode(), true);
+    };
+    $('newGameBtn').onclick = async () => {
+      if (!roomId) return;
+      if (!confirm('Start a new game in this room? Scores go back to zero. Your question pack stays, back at the beginning.')) return;
+      await hostAct('newgame');
+      askedRound = 0;
+      packIndex = -1;
+      showQA();
+      $('packStatus').textContent = pack.length
+        ? 'New game. ' + pack.length + ' questions still loaded. Tap Go to next question.'
+        : 'New game. Scores cleared.';
+      saveHostDesk();
+      setHostTab('play');
+      toast('New game');
     };
     $('newRoomBtn').onclick = () => {
       sessionStorage.removeItem('linebuzz');
@@ -893,6 +950,7 @@
         $('grokStatus').textContent = 'Grok wrote ' + pack.length + '. These are saved so they will not come up again.';
         $('packStatus').textContent = 'Using ' + pack.length + ' new Grok questions.';
         showQA();
+        saveHostDesk();
         setHostTab('play');
       } catch (err) {
         $('grokStatus').textContent = err.message || 'Could not reach Grok';
@@ -920,6 +978,10 @@
       saveAskedSet(new Set());
       toast('Cleared asked list for this pack');
     };
+    ['askLimit', 'startQ', 'grokCount', 'grokTheme'].forEach(id => {
+      $(id).addEventListener('change', saveHostDesk);
+    });
+    $('skipAsked').addEventListener('change', saveHostDesk);
 
     const params = new URLSearchParams(location.search);
     if (params.get('room')) {

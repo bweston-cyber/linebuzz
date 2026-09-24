@@ -81,7 +81,7 @@ export function reduce(room, action, now) {
     return { room, unchanged: false, quiet: true };
   }
 
-  if (["arm", "correct", "wrong", "reset", "next"].includes(type) && id !== room.hostId) {
+  if (["arm", "correct", "wrong", "reset", "next", "newgame"].includes(type) && id !== room.hostId) {
     return { error: "Only the host can do that." };
   }
 
@@ -142,6 +142,17 @@ export function reduce(room, action, now) {
     room.firstBuzzId = null;
     room.firstBuzzName = null;
     room.lastResult = null;
+    bump(room, now);
+    return { room };
+  }
+
+  if (type === "newgame") {
+    for (const player of Object.values(room.players)) player.score = 0;
+    room.phase = "idle";
+    room.firstBuzzId = null;
+    room.firstBuzzName = null;
+    room.lastResult = null;
+    room.lockedOut = [];
     bump(room, now);
     return { room };
   }
