@@ -12,3 +12,12 @@
   to = "/.netlify/functions/question"
   status = 200
   force = true
+
+[[redirects]]
+  from = "/api/room/*"
+  to = "/.netlify/functions/room"
+  status = 200
+  force = true
+
+[functions."room"]
+  timeout = 26

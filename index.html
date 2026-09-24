@@ -170,7 +170,7 @@
         <input id="roomInput" maxlength="6" placeholder="K7P2" autocapitalize="characters" />
         <button class="btn-gold" id="joinBtn" style="width:100%;margin-top:12px">Join</button>
       </div>
-      <p class="note">Works in the phone browser — no app install. Everyone needs the same room code. Stay on this page while you play.</p>
+      <p class="note">Works in the phone browser — no app install. The room lives on the server, so a dropped connection keeps the score and rejoins by itself. Use the Netlify address, not github.io.</p>
     </section>
 
     <section id="game" class="hidden">
@@ -288,15 +288,10 @@
   <input id="hapticSwitch" type="checkbox" switch style="position:fixed;left:-80px;top:-80px;opacity:0;width:44px;height:28px">
 
   <script type="module">
-    import mqtt from 'https://cdn.jsdelivr.net/npm/mqtt@5.14.1/+esm';
-
-    const APP = 'lbw26';
-    const HEARTBEAT_MS = 1500;
-    const STALE_MS = 5000;
-    const BROKERS = [
-      'wss://broker.emqx.io:8084/mqtt',
-      'wss://broker.hivemq.com:8884/mqtt'
-    ];
+    let pollGen = 0;
+    let pollAbort = null;
+    let pollTimer = null;
+    let linked = false;
     const $ = id => document.getElementById(id);
     const home = $('home');
     const game = $('game');
@@ -312,17 +307,13 @@
     }
     const selfId = uid();
 
-    let client = null;
     let isHost = false;
     let myName = '';
     let roomId = '';
-    let syncTimer = null;
     let pack = [];
     let packIndex = -1;
     let packName = '';
     let askedRound = 0;
-    let lastHostBeat = 0;
-    let brokerOk = false;
     let audioCtx = null;
 
     function armAlert() {
@@ -412,8 +403,6 @@
     function escapeHtml(s) {
       return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     }
-    function topic(kind) { return APP + '/' + roomId + '/' + kind; }
-
     function joinUrl() {
       const url = new URL(location.href);
       url.search = '';
@@ -431,16 +420,49 @@
       $('qrModal').classList.remove('hidden');
     }
 
-    function publish(kind, payload, retain) {
-      if (!client || !brokerOk) return;
-      client.publish(topic(kind), JSON.stringify(payload), { qos: 1, retain: !!retain });
+    function roomUrl(extra) {
+      const url = new URL(location.origin + '/api/room/' + roomId);
+      url.searchParams.set('room', roomId);
+      if (extra) Object.entries(extra).forEach(([key, value]) => url.searchParams.set(key, value));
+      return url;
+    }
+
+    async function postAction(type) {
+      const res = await fetch(roomUrl(), {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          type,
+          id: selfId,
+          name: myName,
+          role: isHost ? 'host' : 'player'
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 404) {
+        return { error: 'This address has no room server. Open the Netlify site.' };
+      }
+      return data;
+    }
+
+    async function hostAct(type) {
+      try {
+        const data = await postAction(type);
+        if (data.error) toast(data.error);
+        if (data.room) applyState(data.room);
+        return data;
+      } catch {
+        linked = false;
+        render();
+        toast('Could not reach the room server');
+        return { error: 'offline' };
+      }
     }
 
     function saveSession() {
       sessionStorage.setItem('linebuzz', JSON.stringify({
         role: isHost ? 'host' : 'player',
-        roomId, name: myName,
-        state: isHost ? state : null
+        roomId, name: myName
       }));
     }
 
@@ -454,30 +476,25 @@
         const sorted = entries.sort((a, b) => b[1].score - a[1].score || a[1].name.localeCompare(b[1].name));
         list.innerHTML = sorted.map(([id, p]) => {
           const isThisHost = id === state.hostId;
-          const seen = isThisHost ? (state.beat || p.seen || 0) : (p.seen || 0);
-          const live = isThisHost
-            ? (isHost ? brokerOk : (lastHostBeat && Date.now() - lastHostBeat < STALE_MS))
-            : (id === selfId ? brokerOk : (seen && Date.now() - seen < STALE_MS));
+          const live = p.online !== false;
           const you = id === selfId ? ' <span class="pill">YOU</span>' : '';
           const host = isThisHost ? ' <span class="pill">HOST</span>' : '';
           const buzzed = state.firstBuzzId === id ? ' <span class="pill">BUZZED</span>' : '';
-          const disc = live ? '' : ' <span class="pill warn">DISCONNECTED</span>';
+          const disc = live ? '' : ' <span class="pill warn">AWAY</span>';
           return `<li class="${live ? '' : 'offline'}"><span class="name">${escapeHtml(p.name)}${host}${you}${buzzed}${disc}</span><span class="score">${p.score}</span></li>`;
         }).join('');
       }
 
       const named = Object.keys(state.players).filter(id => id !== state.hostId);
-      const livePlayers = named.filter(id => state.players[id].seen && Date.now() - state.players[id].seen < STALE_MS).length;
-      const hostAge = lastHostBeat ? Math.round((Date.now() - lastHostBeat) / 1000) : null;
-      const hostLive = lastHostBeat && hostAge * 1000 < STALE_MS;
+      const livePlayers = named.filter(id => state.players[id].online !== false).length;
       if (isHost) {
-        $('connHint').textContent = brokerOk
-          ? (livePlayers + ' live / ' + named.length + ' joined')
-          : 'Connecting…';
+        $('connHint').textContent = linked
+          ? (livePlayers + ' here / ' + named.length + ' joined')
+          : 'Reconnecting to the room server…';
       } else {
-        $('connHint').textContent = hostLive
-          ? ('Host connected · ' + (state.hostName || 'host'))
-          : (brokerOk ? 'Looking for host…' : 'Connecting…');
+        $('connHint').textContent = linked
+          ? ('In ' + (state.hostName || 'the') + ' room')
+          : 'Reconnecting to the room server…';
       }
 
       const winner = $('winner');
@@ -495,7 +512,7 @@
         $('correctBtn').disabled = state.phase !== 'locked';
         $('wrongBtn').disabled = state.phase !== 'locked';
         $('armBtn').disabled = state.phase === 'live';
-        if (!brokerOk) setStatus('Connecting to room channel…');
+        if (!linked) setStatus('Reconnecting to the room server…');
         else if (state.phase === 'lobby') setStatus('Players can join. You will see them below as they appear.');
         else if (state.phase === 'idle') setStatus('Ask your question out loud, then activate buzzers.');
         else if (state.phase === 'live') setStatus(
@@ -505,17 +522,12 @@
         else if (state.phase === 'locked') setStatus('Locked. Hear their answer, then mark correct or wrong.', 'locked');
       } else {
         const lockedOut = (state.lockedOut || []).includes(selfId);
-        const armed = state.phase === 'live' && !lockedOut;
-        $('buzzBtn').disabled = !armed || !hostLive;
-        const cut = !brokerOk || !hostLive;
-        $('discBanner').classList.toggle('show', cut);
-        $('playerControls').classList.toggle('cut', cut);
-        if (!brokerOk) {
-          setStatus('DISCONNECTED — reconnecting…');
-          $('playerHint').textContent = 'Stay on LineBuzz. Do not switch apps.';
-        } else if (!hostLive) {
-          setStatus('DISCONNECTED from host — reconnecting…');
-          $('playerHint').textContent = 'Stay on this screen until this banner goes away';
+        $('buzzBtn').disabled = state.phase !== 'live' || lockedOut;
+        $('discBanner').classList.toggle('show', !linked);
+        $('playerControls').classList.toggle('cut', !linked);
+        if (!linked) {
+          setStatus('Reconnecting… your score is still on the server');
+          $('playerHint').textContent = 'Stay in the room. Buzz still sends when the button is live.';
         } else if (state.phase === 'lobby' || state.phase === 'idle') {
           setStatus('Connected to ' + (state.hostName || 'host') + '. Buzzers are off.');
           $('playerHint').textContent = 'Wait for the host to activate buzzers';
@@ -535,108 +547,60 @@
       }
     }
 
-    function broadcastState() {
-      if (!isHost) return;
-      state.beat = Date.now();
-      state.hostId = selfId;
-      state.hostName = myName;
-      if (state.players[selfId]) state.players[selfId].seen = Date.now();
-      publish('state', state, true);
-      saveSession();
-    }
-
     function applyState(next) {
       if (!next || !next.players) return;
+      const becameLocked = linked && state.phase !== 'locked' && next.phase === 'locked';
+      const namesBefore = new Set(linked ? Object.keys(state.players || {}) : Object.keys(next.players));
       state = next;
-      lastHostBeat = next.beat || Date.now();
+      linked = true;
       render();
-    }
-
-    function handleHello(data) {
-      if (!isHost || !data || !data.id || data.id === selfId) return;
-      const name = String(data.name || 'Player').slice(0, 20);
-      const existed = !!state.players[data.id];
-      if (!existed) {
-        state.players[data.id] = { name, score: 0 };
-        if (state.phase === 'lobby') state.phase = 'idle';
-        toast(name + ' joined');
-      } else {
-        state.players[data.id].name = name;
-        state.players[data.id].seen = Date.now();
+      saveSession();
+      if (isHost && becameLocked) pingHost();
+      if (isHost) {
+        Object.entries(next.players).forEach(([id, player]) => {
+          if (id !== selfId && !namesBefore.has(id)) toast(player.name + ' joined');
+        });
       }
-      state.players[data.id].seen = Date.now();
-      broadcastState();
-      render();
     }
 
-    function handleBuzz(data) {
-      if (!isHost || state.phase !== 'live') return;
-      const id = data && data.id;
-      const p = id && state.players[id];
-      if (!p) return;
-      if ((state.lockedOut || []).includes(id)) return;
-      state.phase = 'locked';
-      state.firstBuzzId = id;
-      state.firstBuzzName = p.name;
-      state.lastResult = null;
-      broadcastState();
-      render();
-      pingHost();
+    function stopPoll() {
+      pollGen += 1;
+      if (pollTimer) clearTimeout(pollTimer);
+      if (pollAbort) pollAbort.abort();
     }
 
-    function announce() {
-      if (isHost) broadcastState();
-      else publish('hello', { id: selfId, name: myName, t: Date.now() }, false);
+    async function poll(gen) {
+      if (gen !== pollGen || !roomId) return;
+      const ctrl = new AbortController();
+      pollAbort = ctrl;
+      const kill = setTimeout(() => ctrl.abort(), 12000);
+      try {
+        const res = await fetch(roomUrl({
+          since: String(state.version || 0),
+          id: selfId
+        }), { signal: ctrl.signal, cache: 'no-store' });
+        if (gen !== pollGen) return;
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.room) applyState(data.room);
+        else linked = false;
+      } catch (err) {
+        if (!(err && err.name === 'AbortError')) linked = false;
+      } finally {
+        clearTimeout(kill);
+        if (gen === pollGen) pollTimer = setTimeout(() => poll(gen), linked ? 40 : 700);
+        if (gen === pollGen) render();
+      }
     }
 
-    function connectMqtt(onReady) {
-      let i = 0;
-      const tryBroker = () => {
-        const url = BROKERS[i];
-        setStatus('Connecting…');
-        client = mqtt.connect(url, {
-          clientId: 'lb-' + selfId + '-' + Math.random().toString(36).slice(2, 6),
-          clean: true,
-          reconnectPeriod: 1500,
-          connectTimeout: 8000,
-          keepalive: 20
-        });
-        client.on('connect', () => {
-          brokerOk = true;
-          client.subscribe([topic('state'), topic('hello'), topic('buzz')], { qos: 1 }, () => onReady());
-        });
-        client.on('reconnect', () => { brokerOk = false; render(); });
-        client.on('close', () => { brokerOk = false; render(); });
-        client.on('error', () => {});
-        client.on('message', (t, buf) => {
-          let data;
-          try { data = JSON.parse(buf.toString()); } catch { return; }
-          if (t.endsWith('/state')) {
-            if (!isHost) applyState(data);
-            else if (data && data.hostId && data.hostId !== selfId) {
-              /* ignore other host */
-            }
-          } else if (t.endsWith('/hello')) handleHello(data);
-          else if (t.endsWith('/buzz')) handleBuzz(data);
-        });
-        client.on('offline', () => {
-          brokerOk = false;
-          render();
-          if (i < BROKERS.length - 1 && !client.connected) {
-            i += 1;
-            try { client.end(true); } catch {}
-            tryBroker();
-          }
-        });
-      };
-      tryBroker();
-    }
-
-    function connect(code, hostMode) {
+    async function connect(code, hostMode) {
+      stopPoll();
+      const gen = pollGen;
       roomId = code.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
       if (roomId.length < 3) { toast('Enter a valid room code'); return; }
       myName = ($('displayName').value || '').trim() || (hostMode ? 'Host' : 'Player');
       isHost = hostMode;
+      linked = false;
+      state = emptyState();
       home.classList.add('hidden');
       game.classList.remove('hidden');
       $('roleTag').textContent = isHost ? 'HOST ROOM' : 'PLAYER';
@@ -650,63 +614,36 @@
         $('hostSetup').classList.add('hidden');
         $('hostPlay').classList.add('hidden');
       }
-      setStatus('Connecting to room…');
+      setStatus('Connecting to the room server…');
+      render();
 
-      if (isHost) {
-        const saved = (() => { try { return JSON.parse(sessionStorage.getItem('linebuzz') || '{}'); } catch { return {}; } })();
-        if (saved.state && saved.roomId === roomId && saved.state.players) state = saved.state;
-        else {
-          state = emptyState();
-          state.phase = 'lobby';
-        }
-        state.hostId = selfId;
-        state.hostName = myName;
-        state.players[selfId] = { name: myName, score: (state.players[selfId] && state.players[selfId].score) || 0 };
+      let data;
+      try {
+        data = await postAction('join');
+      } catch {
+        data = { error: 'Could not reach the room server' };
       }
-
-      const startLoop = () => {
-        announce();
-        render();
-        if (syncTimer) clearInterval(syncTimer);
-        syncTimer = setInterval(() => { announce(); render(); }, HEARTBEAT_MS);
-      };
-
-      connectMqtt(startLoop);
-
+      if (!data || data.error || !data.room) {
+        toast((data && data.error) || 'Could not open the room');
+        home.classList.remove('hidden');
+        game.classList.add('hidden');
+        return;
+      }
+      applyState(data.room);
       const url = new URL(location.href);
       url.searchParams.set('room', roomId);
       history.replaceState({}, '', url);
-      saveSession();
       if (isHost) listQuestionFiles();
-      else toast('Joining ' + roomId);
+      else toast('Joined ' + roomId);
+      poll(gen);
     }
 
-    function resumeLink() {
-      lastHostBeat = 0;
-      if (!isHost) render();
-      if (!roomId) return;
-      if (client && client.connected) {
-        announce();
-        return;
-      }
-      try { client && client.reconnect && client.reconnect(); } catch {}
-      if (!client || !client.connected) {
-        try { client && client.end(true); } catch {}
-        connectMqtt(() => { announce(); render(); });
-      }
-      announce();
-    }
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
-        lastHostBeat = 0;
-        brokerOk = false;
-      } else {
-        resumeLink();
-      }
-      render();
+      if (document.visibilityState === 'visible' && roomId && pollAbort) pollAbort.abort();
     });
-    window.addEventListener('focus', resumeLink);
-    window.addEventListener('pageshow', resumeLink);
+    window.addEventListener('pageshow', () => {
+      if (roomId && pollAbort) pollAbort.abort();
+    });
 
     function parsePack(text, url) {
       const items = [];
@@ -873,8 +810,7 @@
       state.lastResult = null;
       state.lockedOut = [];
       showQA();
-      broadcastState();
-      render();
+      hostAct('next');
     }
 
     $('createBtn').onclick = () => {
@@ -883,8 +819,7 @@
     };
     $('newRoomBtn').onclick = () => {
       sessionStorage.removeItem('linebuzz');
-      try { client && client.end(true); } catch {}
-      if (syncTimer) clearInterval(syncTimer);
+      stopPoll();
       state = emptyState();
       connect(makeCode(), true);
       setHostTab('setup');
@@ -900,60 +835,32 @@
     $('roomInput').addEventListener('keydown', e => { if (e.key === 'Enter') connect($('roomInput').value, false); });
     $('armBtn').onclick = () => {
       if (!isHost) return;
-      state.phase = 'live';
-      state.firstBuzzId = null;
-      state.firstBuzzName = null;
-      state.lastResult = null;
-      state.lockedOut = [];
-      state.started = true;
       armAlert();
-      broadcastState();
-      render();
+      hostAct('arm');
     };
     $('correctBtn').onclick = () => {
       if (!isHost || state.phase !== 'locked' || !state.firstBuzzId) return;
-      const p = state.players[state.firstBuzzId];
-      if (p) p.score += 1;
-      state.lastResult = (p ? p.name : 'Player') + ' — correct!';
-      state.phase = 'idle';
-      state.firstBuzzId = null;
-      state.firstBuzzName = null;
-      broadcastState();
-      render();
+      hostAct('correct');
     };
     $('wrongBtn').onclick = () => {
       if (!isHost || state.phase !== 'locked') return;
-      const wrongId = state.firstBuzzId;
-      const p = wrongId ? state.players[wrongId] : null;
-      if (p) p.score -= 1;
-      if (!state.lockedOut) state.lockedOut = [];
-      if (wrongId && !state.lockedOut.includes(wrongId)) state.lockedOut.push(wrongId);
-      state.lastResult = (state.firstBuzzName || 'Player') + ' — incorrect (−1)';
-      state.phase = 'live';
-      state.firstBuzzId = null;
-      state.firstBuzzName = null;
-      broadcastState();
-      render();
+      hostAct('wrong');
     };
     $('resetBtn').onclick = () => {
       if (!isHost) return;
-      state.phase = 'idle';
-      state.firstBuzzId = null;
-      state.firstBuzzName = null;
-      state.lastResult = null;
-      broadcastState();
-      render();
+      hostAct('reset');
     };
-    $('buzzBtn').onclick = () => {
+    $('buzzBtn').onclick = async () => {
       if (state.phase !== 'live') return;
       if ((state.lockedOut || []).includes(selfId)) return;
-      publish('buzz', { id: selfId, t: Date.now() }, false);
-      try { navigator.vibrate && navigator.vibrate(50); } catch {}
       $('buzzBtn').disabled = true;
+      try { navigator.vibrate && navigator.vibrate(50); } catch {}
+      const data = await hostAct('buzz');
+      if (!data || !data.room) $('buzzBtn').disabled = state.phase !== 'live';
     };
     $('leaveBtn').onclick = () => {
       sessionStorage.removeItem('linebuzz');
-      try { client && client.end(true); } catch {}
+      stopPoll();
       location.href = location.pathname;
     };
     $('grokTheme').value = localStorage.getItem('linebuzz-theme') || '';
