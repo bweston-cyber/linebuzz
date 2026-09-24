@@ -150,13 +150,78 @@
     .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
     .tabs button { background: #232c4e; color: var(--muted); border: 1px solid var(--line); }
     .tabs button.on { background: linear-gradient(#f3dc9b, var(--gold)); color: #2a1d00; }
+    body.player-live, body.host-play {
+      height: 100dvh;
+      overflow: hidden;
+      padding: max(8px, env(safe-area-inset-top)) 12px 8px;
+    }
+    body.player-live .wrap, body.host-play .wrap {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    body.player-live #game, body.host-play #game {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    body.player-live #roomCard, body.host-play #roomCard {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+    }
+    body.player-live #roomCard .code, body.host-play #roomCard .code {
+      font-size: 1.05rem;
+      letter-spacing: .16em;
+      margin: 0;
+    }
+    body.player-live #shareHint, body.host-play #shareHint,
+    body.player-live .tiny, body.host-play .tiny { display: none; }
+    body.player-live #playerControls {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 8px;
+      padding: 12px;
+    }
+    body.player-live .status { min-height: 0; margin: 0 0 6px; padding: 8px; font-size: .95rem; }
+    body.player-live .buzzer {
+      flex: 1 1 auto;
+      height: auto;
+      min-height: 128px;
+      margin: 4px 0 8px;
+    }
+    body.player-live #playerHint { margin: 0; }
+    body.player-live #boardCard {
+      flex: 0 1 auto;
+      max-height: 40dvh;
+      overflow: auto;
+      margin-bottom: 8px;
+      padding: 12px;
+    }
+    body.player-live .players li { padding: 7px 10px; margin: 2px 0; }
+    body.player-live #leaveBtn, body.host-play #leaveBtn { padding: 10px 14px; }
+    body.host-play #hostPlay {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+      margin-bottom: 8px;
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="tag">Game show buzzers</div>
-    <h1>LineBuzz</h1>
-    <p class="sub">One host phone. Friends join a room, wait for you to arm the buzzers, and the first tap locks the room.</p>
+    <header id="brand">
+      <div class="tag">Game show buzzers</div>
+      <h1>LineBuzz</h1>
+      <p class="sub">One host phone. Friends join a room, wait for you to arm the buzzers, and the first tap locks the room.</p>
+    </header>
 
     <section id="home" class="card">
       <label for="displayName">Your name</label>
@@ -174,7 +239,7 @@
     </section>
 
     <section id="game" class="hidden">
-      <div class="card">
+      <div class="card" id="roomCard">
         <div class="tag" id="roleTag">ROOM</div>
         <div class="code" id="roomCode">————</div>
         <p class="hint" id="shareHint">Share this code with your friends</p>
@@ -400,6 +465,14 @@
       $('tabPlay').classList.toggle('on', !setup);
       $('hostSetup').classList.toggle('hidden', !isHost || !setup);
       $('hostPlay').classList.toggle('hidden', !isHost || setup);
+      setChrome();
+    }
+    function setChrome() {
+      const onHome = !$('home').classList.contains('hidden');
+      const onHostSetup = isHost && !$('hostSetup').classList.contains('hidden');
+      $('brand').classList.toggle('hidden', !(onHome || onHostSetup));
+      document.body.classList.toggle('player-live', !onHome && !isHost);
+      document.body.classList.toggle('host-play', isHost && !$('hostPlay').classList.contains('hidden'));
     }
     function escapeHtml(s) {
       return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -616,6 +689,7 @@
         $('hostPlay').classList.add('hidden');
       }
       setStatus('Connecting to the room server…');
+      setChrome();
       render();
 
       let data;
@@ -628,6 +702,7 @@
         toast((data && data.error) || 'Could not open the room');
         home.classList.remove('hidden');
         game.classList.add('hidden');
+        setChrome();
         return;
       }
       applyState(data.room);
